@@ -31,11 +31,50 @@ def exit_Game():
 	if prompt == True:
 		window.destroy()
 
+
+# GETS PLAYER'S NAME ================================================================================================
+
+def btn_ok(event=None):
+	if name_Entry.get().isalnum():
+		game_map(chosen_map)
+		name_Frm.pack_forget()
+	else:
+		L = Label(name_Frm, text="Invalid name. Must consist of \nletters and numbers only.", bg="BLACK", fg="RED")
+		L.grid(column=0, row=3, columnspan=2)
+
+def btn_cancel():
+	name_Frm.pack_forget()
+	main_frame.pack()
+
+def get_name(map_selected):
+	global chosen_map
+	chosen_map = map_selected
+
+	main_frame.pack_forget()
+
+	global name_Frm
+	name_Frm = Frame(window, bg="BLACK", pady=100)
+
+	L = Label(name_Frm, text="Please enter your name", bg="BLACK", fg="WHITE", pady=20)
+	L.grid(column=0, row=0, columnspan=2)
+	global name_Entry
+	name_Entry = Entry(name_Frm, width=20)
+	name_Entry.grid(column=0, row=1, columnspan=2)
+	w = Button(name_Frm, text="Proceed", width=10, command=btn_ok)
+	w.grid(column=0, row=2, padx=5, pady=20)
+	w = Button(name_Frm, text="Cancel", width=10, command=btn_cancel)
+	w.grid(column=1, row=2, padx=5, pady=20)
+	name_Entry.focus_set()
+	name_Entry.bind("<Return>", btn_ok)
+
+	name_Frm.pack()
+
+
 # GAME ENVIRONMENT ==================================================================================================
 
 def game_map(chosen_map):
 
-	# MAP FRAME -------------------------------------------------------------
+	# MAP FRAME ---------------------------------------------------------------
 	global map_Frame
 	map_Frame = Frame(window, bg="BLACK", pady=20)
 	
@@ -63,7 +102,7 @@ def game_map(chosen_map):
 	main_frame.pack_forget()
 	create_Map()
 
-	# MENU BOX FRAME --------------------------------------------------------
+	# MENU BOX FRAME ----------------------------------------------------------
 	global optionsFrm
 	optionsFrm = Frame(window, bg="BLACK")
 
@@ -71,10 +110,10 @@ def game_map(chosen_map):
 	map_name_lbl.grid(column=0, row=0, padx=40)	
 	
 	global Back_btn
-	Back_btn = Button(optionsFrm, text="MAIN MENU",bg="sky blue", padx=15, command=back)
+	Back_btn = Button(optionsFrm, text="Exit Game",bg="sky blue", padx=15, pady=0, command=back)
 	Back_btn.grid(column=1, row=0, padx=40)	
-	
-	# CHAT HISTORY FRAME --------------------------------------------------------
+		
+	# CHAT HISTORY FRAME ------------------------------------------------------
 	global chat_history_Frm
 	chat_history_Frm = Frame(window, bg="WHITE", height=50, width=400)
 	chat_history()
@@ -90,29 +129,9 @@ def game_map(chosen_map):
 	entry_Frm.pack()
 	map_template.close()
 
-def chat_history():
-	global T
-	S = Scrollbar(chat_history_Frm)
-	T = Text(chat_history_Frm, height=5, width=60)
-	S.pack(side=RIGHT, fill=Y)
-	T.pack(side=LEFT, fill=Y)
-	S.config(command=T.yview)
-	T.config(yscrollcommand=S.set)
-	T.config(state=DISABLED)
 
-def chat_entry():
-	global E
-	E = Entry(entry_Frm, width=42)
-	E.focus_set()
-	enter_btn = Button(entry_Frm, text="Enter", command=get_chat_entry, pady=0)
-	E.grid(column=0, row=0)
-	enter_btn.grid(column=1, row=0)
+# GAME FUNCTIONS ====================================================================================================
 
-def get_chat_entry():
-	T.config(state=NORMAL)
-	T.insert(END, E.get() + '\n')
-	T.config(state=DISABLED)
-	
 def get_Player_pos():
 	global player_xpos
 	global player_ypos
@@ -186,6 +205,32 @@ def key_listeners(event):
 	else:
 		x = 5	
 
+
+# CHAT FUNCTIONALITIES ==============================================================================================
+
+def chat_history():
+	global T
+	S = Scrollbar(chat_history_Frm)
+	T = Text(chat_history_Frm, height=5, width=60)
+	S.pack(side=RIGHT, fill=Y)
+	T.pack(side=LEFT, fill=Y)
+	S.config(command=T.yview)
+	T.config(yscrollcommand=S.set)
+	T.config(state=DISABLED)
+
+def chat_entry():
+	global E
+	E = Entry(entry_Frm, width=42)
+	E.focus_set()
+	enter_btn = Button(entry_Frm, text="Enter", command=get_chat_entry, pady=0)
+	E.grid(column=0, row=0)
+	enter_btn.grid(column=1, row=0)
+
+def get_chat_entry():
+	T.config(state=NORMAL)
+	T.insert(END, E.get() + '\n')
+	T.config(state=DISABLED)
+
 def back():	# BACK TO MAIN MENU PROMPT
 	prompt = messagebox.askyesno("ARE YOU SURE YOU WANT TO EXIT?", "Once you leave, your game will be lost.")
 	if prompt == True:
@@ -207,9 +252,9 @@ main_frame.pack()
 
 PickLbl = Label(main_frame, text="Please choose a game map", bg="BLACK", fg="#e07b6a", font=("Arial Bold",14))
 PickLbl.grid(column=0, row=0, padx=10, pady=10, ipadx=30, ipady=10, columnspan=3)
-game_map1btn = Button(main_frame, bg='#80dba6', fg="#302727", text="Map 1", command=lambda main_frame=1:game_map(main_frame))
-game_map2btn = Button(main_frame, bg='#80dba6', fg="#302727", text="Map 2", command=lambda main_frame=2:game_map(main_frame))
-game_map3btn = Button(main_frame, bg='#80dba6', fg="#302727", text="Map 3", command=lambda main_frame=3:game_map(main_frame))
+game_map1btn = Button(main_frame, bg='#80dba6', fg="#302727", text="Map 1", command=lambda main_frame=1:get_name(main_frame))
+game_map2btn = Button(main_frame, bg='#80dba6', fg="#302727", text="Map 2", command=lambda main_frame=2:get_name(main_frame))
+game_map3btn = Button(main_frame, bg='#80dba6', fg="#302727", text="Map 3", command=lambda main_frame=3:get_name(main_frame))
 game_map1btn.grid(column=0, row=2, padx=1, pady=10, ipadx=9, ipady=10)
 game_map2btn.grid(column=1, row=2, padx=1, pady=10, ipadx=9, ipady=10)
 game_map3btn.grid(column=2, row=2, padx=1, pady=10, ipadx=9, ipady=10)
