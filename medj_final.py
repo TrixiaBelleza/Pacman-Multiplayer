@@ -48,7 +48,6 @@ connectPacket = packet.ConnectPacket()
 connectPacket.type = TcpPacket.CONNECT
 connectPacket.lobby_id = lobby_id
 connectPacket.player.name = player_name
-
 #Send connect packet to server
 socket.send(connectPacket.SerializeToString()) 
 
@@ -74,25 +73,44 @@ while True:
 	'''
 	#Instantiate chat packet 
 	chatPacket = packet.ChatPacket()
+	#Instantiate disconnect packet
+	disconnectPacket = packet.DisconnectPacket()
 	read_sockets,write_socket,error_socket = select.select(sockets_list,[],[])
 	for socks in read_sockets: 
 		if socks == socket: 
 			packet_received = bytearray(socket.recv(2048))
 			packet.ParseFromString(packet_received)
 			packet_type = packet.type 
+			if packet_type == 0:
+				disconnect_data = bytearray(socket.recv(1024))
+				disconnectPacket.ParseFromString(disconnect_data)
+				#disconnectPacket.ParseFromString(packet_received)
+				print(disconnectPacket.player.name + " has disconnected")
+				sys.exit()
+			if packet_type == 1:
+				#connect_data = bytearray(socket.recv(1024))
+				connectPacket.ParseFromString(packet_received)
+				print(connectPacket.player.name + " has entered the game")
 			if packet_type == 3:
 				#Receive broadcasted data from server
 				# chat_data = bytearray(socket.recv(2048))
 				chatPacket.ParseFromString(packet_received)
 				print("Chat packet broadcasted: " + chatPacket.message) 	
 		else: 
+
 			# #Write your message here
 			chatPacket.type = TcpPacket.CHAT
 			chatPacket.message = sys.stdin.readline()
 			chatPacket.player.name = player_name
 			chatPacket.lobby_id = lobby_id
-			
+		
 			socket.send(chatPacket.SerializeToString())
+
+			if chatPacket.message.strip() == "bye":
+				disconnectPacket.type = TcpPacket.DISCONNECT
+				# disconnectPacket.player.name = player_name
+				socket.send(disconnectPacket.SerializeToString())
+			
 	#Logic is magsend sila kay server ng message
 	#Then server will broadcast it to everyone
 			
