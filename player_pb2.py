@@ -7,7 +7,6 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
-from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -19,9 +18,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='player.proto',
   package='',
   syntax='proto2',
+  serialized_options=_b('\n\005protoB\014PlayerProtos'),
   serialized_pb=_b('\n\x0cplayer.proto\"\"\n\x06Player\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\n\n\x02id\x18\x02 \x01(\tB\x15\n\x05protoB\x0cPlayerProtos')
 )
-_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
 
@@ -39,21 +38,21 @@ _PLAYER = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='id', full_name='Player.id', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -64,6 +63,7 @@ _PLAYER = _descriptor.Descriptor(
 )
 
 DESCRIPTOR.message_types_by_name['Player'] = _PLAYER
+_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 Player = _reflection.GeneratedProtocolMessageType('Player', (_message.Message,), dict(
   DESCRIPTOR = _PLAYER,
@@ -73,6 +73,5 @@ Player = _reflection.GeneratedProtocolMessageType('Player', (_message.Message,),
 _sym_db.RegisterMessage(Player)
 
 
-DESCRIPTOR.has_options = True
-DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), _b('\n\005protoB\014PlayerProtos'))
+DESCRIPTOR._options = None
 # @@protoc_insertion_point(module_scope)

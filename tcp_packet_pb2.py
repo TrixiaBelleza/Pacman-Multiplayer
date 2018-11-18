@@ -7,7 +7,6 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
-from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -20,10 +19,10 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='tcp_packet.proto',
   package='',
   syntax='proto2',
+  serialized_options=_b('\n\005protoB\017TcpPacketProtos'),
   serialized_pb=_b('\n\x10tcp_packet.proto\x1a\x0cplayer.proto\"\x8a\x08\n\tTcpPacket\x12#\n\x04type\x18\x01 \x02(\x0e\x32\x15.TcpPacket.PacketType\x1a\xa4\x01\n\x10\x44isconnectPacket\x12#\n\x04type\x18\x01 \x02(\x0e\x32\x15.TcpPacket.PacketType\x12\x17\n\x06player\x18\x02 \x01(\x0b\x32\x07.Player\x12\x32\n\x06update\x18\x03 \x01(\x0e\x32\".TcpPacket.DisconnectPacket.Update\"\x1e\n\x06Update\x12\n\n\x06NORMAL\x10\x00\x12\x08\n\x04LOST\x10\x01\x1a\xad\x01\n\rConnectPacket\x12#\n\x04type\x18\x01 \x02(\x0e\x32\x15.TcpPacket.PacketType\x12\x17\n\x06player\x18\x02 \x02(\x0b\x32\x07.Player\x12\x10\n\x08lobby_id\x18\x03 \x01(\t\x12/\n\x06update\x18\x04 \x01(\x0e\x32\x1f.TcpPacket.ConnectPacket.Update\"\x1b\n\x06Update\x12\x08\n\x04SELF\x10\x00\x12\x07\n\x03NEW\x10\x01\x1a_\n\x11\x43reateLobbyPacket\x12#\n\x04type\x18\x01 \x02(\x0e\x32\x15.TcpPacket.PacketType\x12\x10\n\x08lobby_id\x18\x02 \x01(\t\x12\x13\n\x0bmax_players\x18\x03 \x01(\x05\x1am\n\nChatPacket\x12#\n\x04type\x18\x01 \x02(\x0e\x32\x15.TcpPacket.PacketType\x12\x0f\n\x07message\x18\x02 \x02(\t\x12\x17\n\x06player\x18\x03 \x01(\x0b\x32\x07.Player\x12\x10\n\x08lobby_id\x18\x04 \x01(\t\x1aU\n\x10PlayerListPacket\x12#\n\x04type\x18\x01 \x02(\x0e\x32\x15.TcpPacket.PacketType\x12\x1c\n\x0bplayer_list\x18\x03 \x03(\x0b\x32\x07.Player\x1aI\n\rErrLdnePacket\x12#\n\x04type\x18\x01 \x02(\x0e\x32\x15.TcpPacket.PacketType\x12\x13\n\x0b\x65rr_message\x18\x02 \x01(\t\x1aJ\n\x0e\x45rrLfullPacket\x12#\n\x04type\x18\x01 \x02(\x0e\x32\x15.TcpPacket.PacketType\x12\x13\n\x0b\x65rr_message\x18\x02 \x01(\t\x1a\x45\n\tErrPacket\x12#\n\x04type\x18\x01 \x02(\x0e\x32\x15.TcpPacket.PacketType\x12\x13\n\x0b\x65rr_message\x18\x02 \x02(\t\"|\n\nPacketType\x12\x0e\n\nDISCONNECT\x10\x00\x12\x0b\n\x07\x43ONNECT\x10\x01\x12\x10\n\x0c\x43REATE_LOBBY\x10\x02\x12\x08\n\x04\x43HAT\x10\x03\x12\x0f\n\x0bPLAYER_LIST\x10\x04\x12\x0c\n\x08\x45RR_LDNE\x10\x05\x12\r\n\tERR_LFULL\x10\x06\x12\x07\n\x03\x45RR\x10\x07\x42\x18\n\x05protoB\x0fTcpPacketProtos')
   ,
   dependencies=[player__pb2.DESCRIPTOR,])
-_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
 
@@ -35,15 +34,15 @@ _TCPPACKET_DISCONNECTPACKET_UPDATE = _descriptor.EnumDescriptor(
   values=[
     _descriptor.EnumValueDescriptor(
       name='NORMAL', index=0, number=0,
-      options=None,
+      serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='LOST', index=1, number=1,
-      options=None,
+      serialized_options=None,
       type=None),
   ],
   containing_type=None,
-  options=None,
+  serialized_options=None,
   serialized_start=220,
   serialized_end=250,
 )
@@ -57,15 +56,15 @@ _TCPPACKET_CONNECTPACKET_UPDATE = _descriptor.EnumDescriptor(
   values=[
     _descriptor.EnumValueDescriptor(
       name='SELF', index=0, number=0,
-      options=None,
+      serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='NEW', index=1, number=1,
-      options=None,
+      serialized_options=None,
       type=None),
   ],
   containing_type=None,
-  options=None,
+  serialized_options=None,
   serialized_start=399,
   serialized_end=426,
 )
@@ -79,39 +78,39 @@ _TCPPACKET_PACKETTYPE = _descriptor.EnumDescriptor(
   values=[
     _descriptor.EnumValueDescriptor(
       name='DISCONNECT', index=0, number=0,
-      options=None,
+      serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='CONNECT', index=1, number=1,
-      options=None,
+      serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='CREATE_LOBBY', index=2, number=2,
-      options=None,
+      serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='CHAT', index=3, number=3,
-      options=None,
+      serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='PLAYER_LIST', index=4, number=4,
-      options=None,
+      serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='ERR_LDNE', index=5, number=5,
-      options=None,
+      serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='ERR_LFULL', index=6, number=6,
-      options=None,
+      serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
       name='ERR', index=7, number=7,
-      options=None,
+      serialized_options=None,
       type=None),
   ],
   containing_type=None,
-  options=None,
+  serialized_options=None,
   serialized_start=945,
   serialized_end=1069,
 )
@@ -131,21 +130,21 @@ _TCPPACKET_DISCONNECTPACKET = _descriptor.Descriptor(
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='player', full_name='TcpPacket.DisconnectPacket.player', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='update', full_name='TcpPacket.DisconnectPacket.update', index=2,
       number=3, type=14, cpp_type=8, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -153,7 +152,7 @@ _TCPPACKET_DISCONNECTPACKET = _descriptor.Descriptor(
   enum_types=[
     _TCPPACKET_DISCONNECTPACKET_UPDATE,
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -176,28 +175,28 @@ _TCPPACKET_CONNECTPACKET = _descriptor.Descriptor(
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='player', full_name='TcpPacket.ConnectPacket.player', index=1,
       number=2, type=11, cpp_type=10, label=2,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='lobby_id', full_name='TcpPacket.ConnectPacket.lobby_id', index=2,
       number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='update', full_name='TcpPacket.ConnectPacket.update', index=3,
       number=4, type=14, cpp_type=8, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -205,7 +204,7 @@ _TCPPACKET_CONNECTPACKET = _descriptor.Descriptor(
   enum_types=[
     _TCPPACKET_CONNECTPACKET_UPDATE,
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -228,28 +227,28 @@ _TCPPACKET_CREATELOBBYPACKET = _descriptor.Descriptor(
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='lobby_id', full_name='TcpPacket.CreateLobbyPacket.lobby_id', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='max_players', full_name='TcpPacket.CreateLobbyPacket.max_players', index=2,
       number=3, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -272,35 +271,35 @@ _TCPPACKET_CHATPACKET = _descriptor.Descriptor(
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='message', full_name='TcpPacket.ChatPacket.message', index=1,
       number=2, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='player', full_name='TcpPacket.ChatPacket.player', index=2,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='lobby_id', full_name='TcpPacket.ChatPacket.lobby_id', index=3,
       number=4, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -323,21 +322,21 @@ _TCPPACKET_PLAYERLISTPACKET = _descriptor.Descriptor(
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='player_list', full_name='TcpPacket.PlayerListPacket.player_list', index=1,
       number=3, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -360,21 +359,21 @@ _TCPPACKET_ERRLDNEPACKET = _descriptor.Descriptor(
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='err_message', full_name='TcpPacket.ErrLdnePacket.err_message', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -397,21 +396,21 @@ _TCPPACKET_ERRLFULLPACKET = _descriptor.Descriptor(
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='err_message', full_name='TcpPacket.ErrLfullPacket.err_message', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -434,21 +433,21 @@ _TCPPACKET_ERRPACKET = _descriptor.Descriptor(
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='err_message', full_name='TcpPacket.ErrPacket.err_message', index=1,
       number=2, type=9, cpp_type=9, label=2,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -471,7 +470,7 @@ _TCPPACKET = _descriptor.Descriptor(
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -479,7 +478,7 @@ _TCPPACKET = _descriptor.Descriptor(
   enum_types=[
     _TCPPACKET_PACKETTYPE,
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -516,6 +515,7 @@ _TCPPACKET_ERRPACKET.containing_type = _TCPPACKET
 _TCPPACKET.fields_by_name['type'].enum_type = _TCPPACKET_PACKETTYPE
 _TCPPACKET_PACKETTYPE.containing_type = _TCPPACKET
 DESCRIPTOR.message_types_by_name['TcpPacket'] = _TCPPACKET
+_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 TcpPacket = _reflection.GeneratedProtocolMessageType('TcpPacket', (_message.Message,), dict(
 
@@ -589,6 +589,5 @@ _sym_db.RegisterMessage(TcpPacket.ErrLfullPacket)
 _sym_db.RegisterMessage(TcpPacket.ErrPacket)
 
 
-DESCRIPTOR.has_options = True
-DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), _b('\n\005protoB\017TcpPacketProtos'))
+DESCRIPTOR._options = None
 # @@protoc_insertion_point(module_scope)
