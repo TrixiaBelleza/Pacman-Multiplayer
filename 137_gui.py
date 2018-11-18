@@ -6,9 +6,14 @@ from tkinter import messagebox
 
 def pacman_window():
 	tk_window = tkinter.Tk()
-	tk_window.title("PROJECT")
-	tk_window.geometry("500x500") 
-	tk_window.configure(bg="BLACK",padx=50, pady=50)
+	tk_window.title("BATTLE OF THE PACMEN")
+	w = 500 # height for tk_window
+	h = 500 # height for tk_window
+	x = (tk_window.winfo_screenwidth()/2) - (w/2) # calculate x and y coordinates for tk_window
+	y = (tk_window.winfo_screenheight()/2) - (h/2)
+	# set the dimensions of the screen and where it is placed
+	tk_window.geometry('%dx%d+%d+%d' % (w, h, x, y))
+	tk_window.configure(bg="BLACK", padx=50, pady=50)
 	return tk_window
 
 def main():
@@ -29,8 +34,10 @@ def exit_Game():
 # GAME ENVIRONMENT ==================================================================================================
 
 def game_map(chosen_map):
-	global frame
-	frame = Frame(window, bg="BLACK", pady=50)
+
+	# MAP FRAME -------------------------------------------------------------
+	global map_Frame
+	map_Frame = Frame(window, bg="BLACK", pady=20)
 	
 	map_template = None
 	if chosen_map == 1:
@@ -55,9 +62,10 @@ def game_map(chosen_map):
 
 	main_frame.pack_forget()
 	create_Map()
-	
+
+	# MENU BOX FRAME --------------------------------------------------------
 	global optionsFrm
-	optionsFrm = Frame(window, bg="BLACK", pady=5)
+	optionsFrm = Frame(window, bg="BLACK")
 
 	map_name_lbl = Label(optionsFrm, text=map_name, bg="#80dba6", padx=15)
 	map_name_lbl.grid(column=0, row=0, padx=40)	
@@ -66,10 +74,45 @@ def game_map(chosen_map):
 	Back_btn = Button(optionsFrm, text="MAIN MENU",bg="sky blue", padx=15, command=back)
 	Back_btn.grid(column=1, row=0, padx=40)	
 	
+	# CHAT HISTORY FRAME --------------------------------------------------------
+	global chat_history_Frm
+	chat_history_Frm = Frame(window, bg="WHITE", height=50, width=400)
+	chat_history()
+
+	# CHAT ENTRY FRAME --------------------------------------------------------
+	global entry_Frm
+	entry_Frm = Frame(window, bg="BLACK", height=50, width=400)
+	chat_entry()
+
 	optionsFrm.pack()
-	frame.pack()
+	map_Frame.pack()
+	chat_history_Frm.pack()
+	entry_Frm.pack()
 	map_template.close()
 
+def chat_history():
+	global T
+	S = Scrollbar(chat_history_Frm)
+	T = Text(chat_history_Frm, height=5, width=60)
+	S.pack(side=RIGHT, fill=Y)
+	T.pack(side=LEFT, fill=Y)
+	S.config(command=T.yview)
+	T.config(yscrollcommand=S.set)
+	T.config(state=DISABLED)
+
+def chat_entry():
+	global E
+	E = Entry(entry_Frm, width=42)
+	E.focus_set()
+	enter_btn = Button(entry_Frm, text="Enter", command=get_chat_entry, pady=0)
+	E.grid(column=0, row=0)
+	enter_btn.grid(column=1, row=0)
+
+def get_chat_entry():
+	T.config(state=NORMAL)
+	T.insert(END, E.get() + '\n')
+	T.config(state=DISABLED)
+	
 def get_Player_pos():
 	global player_xpos
 	global player_ypos
@@ -83,7 +126,7 @@ def create_Map():
 	block_height = 20 * len(map_matrix)
 	block_width = 20 * len(map_matrix[0])
 	global canvas
-	canvas = tkinter.Canvas(frame, bg="BLACK", height=block_height, width=block_width)
+	canvas = tkinter.Canvas(map_Frame, bg="BLACK", height=block_height, width=block_width)
 	
 	y_pos = 0 # starting pixel in canvas
 	increment = 20 # to determine next position
@@ -117,47 +160,52 @@ def create_Map():
 	canvas.pack()
 
 def key_listeners(event):
-	get_Player_pos()
-	# PWEDE PA ATA MAPAIKLI PA HAHA
-	if event.keysym == "Left":
-		if map_matrix[player_xpos][player_ypos-1] == "D" or map_matrix[player_xpos][player_ypos-1] == "s" or map_matrix[player_xpos][player_ypos-1] == "e":
-			map_matrix[player_xpos][player_ypos] = "e"
-			map_matrix[player_xpos][player_ypos-1] = "P"
-	elif event.keysym == "Right": # Right
-		if map_matrix[player_xpos][player_ypos+1] == "D" or map_matrix[player_xpos][player_ypos+1] == "s" or map_matrix[player_xpos][player_ypos+1] == "e":
-			map_matrix[player_xpos][player_ypos] = "e"
-			map_matrix[player_xpos][player_ypos+1] = "P"
-	elif event.keysym == "Up":
-		if map_matrix[player_xpos-1][player_ypos] == "D" or map_matrix[player_xpos-1][player_ypos] == "s" or map_matrix[player_xpos-1][player_ypos] == "e":
-			map_matrix[player_xpos][player_ypos] = "e"
-			map_matrix[player_xpos-1][player_ypos] = "P"
-	elif event.keysym == "Down":
-		if map_matrix[player_xpos+1][player_ypos] == "D" or map_matrix[player_xpos+1][player_ypos] == "s" or map_matrix[player_xpos+1][player_ypos] == "e":
-			map_matrix[player_xpos][player_ypos] = "e"
-			map_matrix[player_xpos+1][player_ypos] = "P"
-	
-	# BAD IMPLEMENTATION PA TO BC BUONG MAP YUNG BINABAGO HAHAHA
-	canvas.pack_forget()
-	create_Map()
+	if event.keysym == "Left" or event.keysym == "Right" or event.keysym == "Up" or event.keysym == "Down":
+		get_Player_pos()
+		# PWEDE PA ATA MAPAIKLI PA HAHA
+		if event.keysym == "Left":
+			if map_matrix[player_xpos][player_ypos-1] == "D" or map_matrix[player_xpos][player_ypos-1] == "s" or map_matrix[player_xpos][player_ypos-1] == "e":
+				map_matrix[player_xpos][player_ypos] = "e"
+				map_matrix[player_xpos][player_ypos-1] = "P"
+		elif event.keysym == "Right": # Right
+			if map_matrix[player_xpos][player_ypos+1] == "D" or map_matrix[player_xpos][player_ypos+1] == "s" or map_matrix[player_xpos][player_ypos+1] == "e":
+				map_matrix[player_xpos][player_ypos] = "e"
+				map_matrix[player_xpos][player_ypos+1] = "P"
+		elif event.keysym == "Up":
+			if map_matrix[player_xpos-1][player_ypos] == "D" or map_matrix[player_xpos-1][player_ypos] == "s" or map_matrix[player_xpos-1][player_ypos] == "e":
+				map_matrix[player_xpos][player_ypos] = "e"
+				map_matrix[player_xpos-1][player_ypos] = "P"
+		elif event.keysym == "Down":
+			if map_matrix[player_xpos+1][player_ypos] == "D" or map_matrix[player_xpos+1][player_ypos] == "s" or map_matrix[player_xpos+1][player_ypos] == "e":
+				map_matrix[player_xpos][player_ypos] = "e"
+				map_matrix[player_xpos+1][player_ypos] = "P"
+		
+		# BAD IMPLEMENTATION PA TO BC BUONG MAP YUNG BINABAGO HAHAHA
+		canvas.pack_forget()
+		create_Map()
+	else:
+		x = 5	
 
-def back():
-	prompt = messagebox.askyesno("ARE YOU SURE YOU WANT TO GO BACK?", "Once you go back to the main menu, \n your game will be lost.")
+def back():	# BACK TO MAIN MENU PROMPT
+	prompt = messagebox.askyesno("ARE YOU SURE YOU WANT TO EXIT?", "Once you leave, your game will be lost.")
 	if prompt == True:
-		frame.destroy()
+		map_Frame.destroy()
 		optionsFrm.destroy()
+		chat_history_Frm.destroy()
+		entry_Frm.destroy()
 		main_frame.pack()
 
 # MAIN ==============================================================================================================
 
 window = main()
 window.resizable(width=FALSE, height=FALSE)
-main_frame = Frame(window, bg="BLACK", padx=50, pady=50, )
+main_frame = Frame(window, bg="BLACK", padx=50, pady=50)
 main_frame.pack_propagate(False)
 main_frame.pack()
 
 # MAIN WINDOW WIDGETS ===============================================================================================
 
-PickLbl = Label(main_frame, text="Please choose\na game map", bg="BLACK", fg="#e07b6a", font=("Arial Bold",14))
+PickLbl = Label(main_frame, text="Please choose a game map", bg="BLACK", fg="#e07b6a", font=("Arial Bold",14))
 PickLbl.grid(column=0, row=0, padx=10, pady=10, ipadx=30, ipady=10, columnspan=3)
 game_map1btn = Button(main_frame, bg='#80dba6', fg="#302727", text="Map 1", command=lambda main_frame=1:game_map(main_frame))
 game_map2btn = Button(main_frame, bg='#80dba6', fg="#302727", text="Map 2", command=lambda main_frame=2:game_map(main_frame))
