@@ -32,7 +32,7 @@ def exit_Game():
 		window.destroy()
 
 
-# GETS PLAYER'S NAME ================================================================================================
+# GETS PLAYER'chat_scrollbar NAME ================================================================================================
 
 def btn_ok(event=None):
 	if name_Entry.get().isalnum():
@@ -146,6 +146,7 @@ def create_Map():
 	block_width = 20 * len(map_matrix[0])
 	global canvas
 	canvas = tkinter.Canvas(map_Frame, bg="BLACK", height=block_height, width=block_width)
+	canvas.pack()
 	
 	y_pos = 0 # starting pixel in canvas
 	increment = 20 # to determine next position
@@ -175,63 +176,72 @@ def create_Map():
 			x_pos += increment
 		y_pos += increment
 	
-	canvas.bind_all("<KeyPress>", key_listeners) # binds event listener to whole canvas
-	canvas.pack()
+	canvas.bind_all("<KeyPress-Up>", key_listeners) # binds event listener to whole canvas
+	canvas.bind_all("<KeyPress-Down>", key_listeners) # binds event listener to whole canvas
+	canvas.bind_all("<KeyPress-Left>", key_listeners) # binds event listener to whole canvas
+	canvas.bind_all("<KeyPress-Right>", key_listeners) # binds event listener to whole canvas
 
 def key_listeners(event):
-	if event.keysym == "Left" or event.keysym == "Right" or event.keysym == "Up" or event.keysym == "Down":
-		get_Player_pos()
-		# PWEDE PA ATA MAPAIKLI PA HAHA
-		if event.keysym == "Left":
-			if map_matrix[player_xpos][player_ypos-1] == "D" or map_matrix[player_xpos][player_ypos-1] == "s" or map_matrix[player_xpos][player_ypos-1] == "e":
-				map_matrix[player_xpos][player_ypos] = "e"
-				map_matrix[player_xpos][player_ypos-1] = "P"
-		elif event.keysym == "Right": # Right
-			if map_matrix[player_xpos][player_ypos+1] == "D" or map_matrix[player_xpos][player_ypos+1] == "s" or map_matrix[player_xpos][player_ypos+1] == "e":
-				map_matrix[player_xpos][player_ypos] = "e"
-				map_matrix[player_xpos][player_ypos+1] = "P"
-		elif event.keysym == "Up":
-			if map_matrix[player_xpos-1][player_ypos] == "D" or map_matrix[player_xpos-1][player_ypos] == "s" or map_matrix[player_xpos-1][player_ypos] == "e":
-				map_matrix[player_xpos][player_ypos] = "e"
-				map_matrix[player_xpos-1][player_ypos] = "P"
-		elif event.keysym == "Down":
-			if map_matrix[player_xpos+1][player_ypos] == "D" or map_matrix[player_xpos+1][player_ypos] == "s" or map_matrix[player_xpos+1][player_ypos] == "e":
-				map_matrix[player_xpos][player_ypos] = "e"
-				map_matrix[player_xpos+1][player_ypos] = "P"
-		
-		# BAD IMPLEMENTATION PA TO BC BUONG MAP YUNG BINABAGO HAHAHA
-		canvas.pack_forget()
-		create_Map()
-	else:
-		x = 5	
+	get_Player_pos()
+
+	if event.keysym == "Left":
+		if map_matrix[player_xpos][player_ypos-1] == "D" or map_matrix[player_xpos][player_ypos-1] == "s" or map_matrix[player_xpos][player_ypos-1] == "e":
+			map_matrix[player_xpos][player_ypos] = "e"
+			map_matrix[player_xpos][player_ypos-1] = "P"
+			block = canvas.create_rectangle(player_ypos*20, player_xpos*20, player_ypos*20+20, player_xpos*20+20, fill="BLACK", outline="")
+			block = canvas.create_rectangle((player_ypos-1)*20, player_xpos*20, (player_ypos-1)*20+20, player_xpos*20+20, fill="RED", outline="")
+	elif event.keysym == "Right":
+		if map_matrix[player_xpos][player_ypos+1] == "D" or map_matrix[player_xpos][player_ypos+1] == "s" or map_matrix[player_xpos][player_ypos+1] == "e":
+			map_matrix[player_xpos][player_ypos] = "e"
+			map_matrix[player_xpos][player_ypos+1] = "P"
+			block = canvas.create_rectangle(player_ypos*20, player_xpos*20, player_ypos*20+20, player_xpos*20+20, fill="BLACK", outline="")
+			block = canvas.create_rectangle((player_ypos+1)*20, player_xpos*20, (player_ypos+1)*20+20, player_xpos*20+20, fill="RED", outline="")
+	elif event.keysym == "Up":
+		if map_matrix[player_xpos-1][player_ypos] == "D" or map_matrix[player_xpos-1][player_ypos] == "s" or map_matrix[player_xpos-1][player_ypos] == "e":
+			map_matrix[player_xpos][player_ypos] = "e"
+			map_matrix[player_xpos-1][player_ypos] = "P"
+			block = canvas.create_rectangle(player_ypos*20, player_xpos*20, player_ypos*20+20, player_xpos*20+20, fill="BLACK", outline="")
+			block = canvas.create_rectangle(player_ypos*20, (player_xpos-1)*20, player_ypos*20+20, (player_xpos-1)*20+20, fill="RED", outline="")
+	elif event.keysym == "Down":
+		if map_matrix[player_xpos+1][player_ypos] == "D" or map_matrix[player_xpos+1][player_ypos] == "s" or map_matrix[player_xpos+1][player_ypos] == "e":
+			map_matrix[player_xpos][player_ypos] = "e"
+			map_matrix[player_xpos+1][player_ypos] = "P"
+			block = canvas.create_rectangle(player_ypos*20, player_xpos*20, player_ypos*20+20, player_xpos*20+20, fill="BLACK", outline="")
+			block = canvas.create_rectangle(player_ypos*20, (player_xpos+1)*20, player_ypos*20+20, (player_xpos+1)*20+20, fill="RED", outline="")
 
 
 # CHAT FUNCTIONALITIES ==============================================================================================
 
 def chat_history():
-	global T
-	S = Scrollbar(chat_history_Frm)
-	T = Text(chat_history_Frm, height=5, width=60)
-	S.pack(side=RIGHT, fill=Y)
-	T.pack(side=LEFT, fill=Y)
-	S.config(command=T.yview)
-	T.config(yscrollcommand=S.set)
-	T.config(state=DISABLED)
+	global chat_history_Txt
+	chat_scrollbar = Scrollbar(chat_history_Frm)
+	chat_history_Txt = Text(chat_history_Frm, height=5, width=60)
+	chat_scrollbar.pack(side=RIGHT, fill=Y)
+	chat_history_Txt.pack(side=LEFT, fill=Y)
+	chat_scrollbar.config(command=chat_history_Txt.yview)
+	chat_history_Txt.config(yscrollcommand=chat_scrollbar.set)
+	chat_history_Txt.config(state=DISABLED)
 
 def chat_entry():
-	global E
-	E = Entry(entry_Frm, width=42)
-	E.focus_set()
-	enter_btn = Button(entry_Frm, text="Enter", command=get_chat_entry, pady=0)
-	E.grid(column=0, row=0)
-	enter_btn.grid(column=1, row=0)
+	global chat_entry
+	chat_entry = Entry(entry_Frm, width=42)
+	chat_entry.focus_set()
+	chat_entry.bind("<Return>", get_chat_entry)
+	chat_entry.grid(column=0, row=0)
 
-def get_chat_entry():
-	T.config(state=NORMAL)
-	T.insert(END, E.get() + '\n')
-	T.config(state=DISABLED)
+	enter_chat_btn = Button(entry_Frm, text="Enter", command=get_chat_entry, pady=0)
+	enter_chat_btn.grid(column=1, row=0)
 
-def back():	# BACK TO MAIN MENU PROMPT
+def get_chat_entry(event=None):
+	chat_history_Txt.config(state=NORMAL)
+	chat_history_Txt.insert(END, chat_entry.get() + '\n')
+	chat_history_Txt.see("end")
+	chat_history_Txt.config(state=DISABLED)
+	chat_entry.delete(0,len(chat_entry.get()))
+
+
+# BACK TO MAIN MENU PROMPT
+def back():
 	prompt = messagebox.askyesno("ARE YOU SURE YOU WANT TO EXIT?", "Once you leave, your game will be lost.")
 	if prompt == True:
 		map_Frame.destroy()
