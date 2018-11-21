@@ -1,4 +1,4 @@
-import backend_chat
+# import backend_chat
 import tkinter
 from tkinter import *
 from tkinter import messagebox
@@ -19,7 +19,7 @@ def pacman_window():
 
 def main():
 	window = pacman_window()
-	main_chat()
+	#main_chat()
 	return window
 
 def show_About():
