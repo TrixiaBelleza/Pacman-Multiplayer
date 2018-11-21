@@ -1,7 +1,7 @@
 '''
-	d. connect to server
 Coding scheme:
-	Camel case for functions ThisIsCamelCase 
+	Camel case beginning with an UPPERCASE letter for functions ThisIsCamelCase
+	Camel case beginning with a lowercase letter for packets like connectPacket, lobbyPacket, etc.
 	Snake case for variables	this_is_snake_case
 '''
 import socket
@@ -43,7 +43,6 @@ if role == 'h': #Host
 	connectPacket.player.name = player_name
 	#Send connect packet to server
 	socket.send(connectPacket.SerializeToString()) 
-
 	#Receive broadcasted data from server
 	connect_data = bytearray(socket.recv(1024)) # receive response from server
 	connectPacket.ParseFromString(connect_data)
@@ -59,7 +58,9 @@ else:	#Player (NOT HOST)
 			connectPacket.type = TcpPacket.CONNECT
 			connectPacket.lobby_id = lobby_id
 			connectPacket.player.name = player_name
+			#Send connect packet to server
 			socket.send(connectPacket.SerializeToString()) 
+			#Receive broadcasted data from server
 			connect_data = bytearray(socket.recv(1024)) # receive response from server
 			connectPacket.ParseFromString(connect_data)
 			#if the received response from the server is ERR_LFULL, 
@@ -71,7 +72,7 @@ else:	#Player (NOT HOST)
 		except:
 			if connectPacket.type == TcpPacket.ERR_LDNE:
 				print("Lobby does not exist!\n")
-	
+
 print('Received from server: ' + str(connectPacket))  # show in terminal
 
 #on-going chat room
@@ -94,9 +95,6 @@ while True:
 	#Instantiate disconnect packet
 	disconnectPacket = packet.DisconnectPacket()
 	disconnectPacket.type = TcpPacket.DISCONNECT
-	#Instantiate player list packet
-	playerListPacket = packet.PlayerListPacket()
-	playerListPacket.type = TcpPacket.PLAYER_LIST
 	read_sockets,write_socket,error_socket = select.select(sockets_list,[],[])
 	for socks in read_sockets: 
 		if socks == socket: 
@@ -121,12 +119,10 @@ while True:
 				print(connectPacket.player.name + " has entered the game")
 			#Chat packet type
 			if packet_type == 3:
+				#Receive broadcasted data from server
 				chatPacket.ParseFromString(packet_received)
 				print(chatPacket.player.name+": "+ chatPacket.message) 
-			if packet_type == 5:
-				print("EROOR")	
 		else: 
-
 			# #Write your message here
 			chatPacket.type = TcpPacket.CHAT
 			chatPacket.message = sys.stdin.readline()
@@ -137,10 +133,7 @@ while True:
 
 			if chatPacket.message.strip() == "bye":
 				disconnectPacket.type = TcpPacket.DISCONNECT
+
 				disconnectPacket.player.name = player_name
 				socket.send(disconnectPacket.SerializeToString())
-			
-	#Logic is magsend sila kay server ng message
-	#Then server will broadcast it to everyone
-			
 socket.close() 
