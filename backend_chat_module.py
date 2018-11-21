@@ -39,19 +39,47 @@ def InstantiatePlayer(player_name):
 	player.name = player_name
 	return player
 
-def ConnectPlayerToServer(player, packet, lobby_id):
-	#Connect players (including host) to server using connectPacket
-	#Instantiate connectPacket 
+#Connect players (including host) to server using connectPacket	
+def ConnectPlayerToServer(player, packet):
 	connectPacket = packet.ConnectPacket()
-	connectPacket.type = TcpPacket.CONNECT
-	connectPacket.lobby_id = lobby_id
-	connectPacket.player.name = player.name
-	#Send connect packet to server
-	socket.send(connectPacket.SerializeToString()) 
 
-	#Receive broadcasted data from server
-	connect_data = bytearray(socket.recv(1024)) # receive response from server
-	connectPacket.ParseFromString(connect_data)
+	role = input("Are you a HOST(H) or a PLAYER(P)? : ").lower()
+
+	if role == "h":
+		connectPacket.type = TcpPacket.CONNECT
+		lobby_id = CreateLobby(packet)
+		connectPacket.lobby_id = lobby_id
+		connectPacket.player.name = player.name
+		#Send connect packet to server
+		socket.send(connectPacket.SerializeToString()) 
+
+		#Receive broadcasted data from server
+		connect_data = bytearray(socket.recv(1024)) # receive response from server
+		connectPacket.ParseFromString(connect_data)
+	else:
+		connectPacket.type = TcpPacket.ERR_LDNE
+		#assume first that the connectPacket type is error packet so that all can be put inside a try catch
+		#and loop until the lobby chosen is existing or is not full
+		while connectPacket.type == TcpPacket.ERR_LDNE or connectPacket.type == TcpPacket.ERR_LFULL:
+			try:
+				lobby_id = input("Enter lobby id: ") 
+				connectPacket.type = TcpPacket.CONNECT
+				connectPacket.lobby_id = lobby_id
+				connectPacket.player.name = player.name
+				#Send connect packet to server
+				socket.send(connectPacket.SerializeToString()) 
+				#Receive broadcasted data from server
+				connect_data = bytearray(socket.recv(1024)) # receive response from server
+				connectPacket.ParseFromString(connect_data)
+				#if the received response from the server is ERR_LFULL, 
+				#parsing connect_data will NOT result to exception
+				if connectPacket.type == TcpPacket.ERR_LFULL:
+					print("Lobby is full!\n")
+				#if the received response from server is ERR_LDNE, 
+				#parsing connect_data will result to an exception hence going inside except block
+			except:
+				if connectPacket.type == TcpPacket.ERR_LDNE:
+					print("Lobby does not exist!\n")
 	print('Received from server: ' + str(connectPacket))  # show in terminal
 	return connectPacket
 
@@ -75,36 +103,47 @@ def Chat(player, packet, lobby_id, connectPacket):
 		chatPacket = packet.ChatPacket()
 		#Instantiate disconnect packet
 		disconnectPacket = packet.DisconnectPacket()
+		disconnectPacket.type = TcpPacket.DISCONNECT
 		read_sockets,write_socket,error_socket = select.select(sockets_list,[],[])
 		for socks in read_sockets: 
 			if socks == socket: 
 				packet_received = bytearray(socket.recv(2048))
 				packet.ParseFromString(packet_received)
 				packet_type = packet.type 
+				#Disconnect packet type
 				if packet_type == 0:
-					disconnect_data = bytearray(socket.recv(1024))
-					disconnectPacket.ParseFromString(disconnect_data)
-					print(disconnectPacket.player.name + " has disconnected")
-					sys.exit()
+					disconnectPacket.ParseFromString(packet_received)
+					if disconnectPacket.player.name == "":
+						#if the disconnection is normal
+						if disconnectPacket.update == 0:
+							print("You left the game.")
+						else:
+							print("Unknown error occured.\nYou have been disconnected from the game")
+						sys.exit()
+					else :
+						print(disconnectPacket.player.name + " has left the game.")
+				#Connect packet type
 				if packet_type == 1:
 					connectPacket.ParseFromString(packet_received)
 					print(connectPacket.player.name + " has entered the game")
+				#Chat packet type
 				if packet_type == 3:
 					#Receive broadcasted data from server
 					chatPacket.ParseFromString(packet_received)
-					print("Chat packet broadcasted: " + chatPacket.message) 	
+					print(chatPacket.player.name+": "+ chatPacket.message) 
 			else: 
-
 				# #Write your message here
 				chatPacket.type = TcpPacket.CHAT
 				chatPacket.message = sys.stdin.readline()
-				chatPacket.player.name = player.name
+				chatPacket.player.name = player_name
 				chatPacket.lobby_id = lobby_id
 			
 				socket.send(chatPacket.SerializeToString())
 
 				if chatPacket.message.strip() == "bye":
 					disconnectPacket.type = TcpPacket.DISCONNECT
+
+					disconnectPacket.player.name = player_name
 					socket.send(disconnectPacket.SerializeToString())
 
 #######################################################################
@@ -118,15 +157,6 @@ packet = TcpPacket()
 player_name = input("Enter name: ")
 player = InstantiatePlayer(player_name)
 
-role = input("Are you a HOST(H) or a PLAYER(P)? : ").lower()
-
-if role == "h":
-	lobby_id = CreateLobby(packet)
-
-else:
-	#Input lobby id
-	lobby_id = input("Enter lobby id: ") 
-
-connectPacket = ConnectPlayerToServer(player, packet, lobby_id)
-Chat(player, packet, lobby_id, connectPacket)
+connectPacket = ConnectPlayerToServer(player, packet)
+Chat(player, packet, connectPacket.lobby_id, connectPacket)
 socket.close() 
