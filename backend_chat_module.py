@@ -104,6 +104,9 @@ def Chat(player, packet, lobby_id, connectPacket):
 		#Instantiate disconnect packet
 		disconnectPacket = packet.DisconnectPacket()
 		disconnectPacket.type = TcpPacket.DISCONNECT
+		#Instantiate playerList packet
+		playerListPacket = packet.PlayerListPacket()
+		playerListPacket.type = TcpPacket.PLAYER_LIST
 		read_sockets,write_socket,error_socket = select.select(sockets_list,[],[])
 		for socks in read_sockets: 
 			if socks == socket: 
@@ -122,10 +125,34 @@ def Chat(player, packet, lobby_id, connectPacket):
 						sys.exit()
 					else :
 						print(disconnectPacket.player.name + " has left the game.")
+						#After a player left the game, check the player list from the server
+						#Send player list packet to the server
+						socket.send(playerListPacket.SerializeToString())
+						#Receive the player list from the server
+						packet_received = bytearray(socket.recv(2048))
+						playerListPacket.ParseFromString(packet_received)
+						print("---Players---")
+						#Iterate the player_list
+						player_no = 0
+						for player in playerListPacket.player_list:
+							player_no += 1
+							print(str(player_no)+". "+player.name)
 				#Connect packet type
 				if packet_type == 1:
 					connectPacket.ParseFromString(packet_received)
 					print(connectPacket.player.name + " has entered the game")
+					#After a new player entered the game, check the player list from the server
+					#Send player list packet to the server
+					socket.send(playerListPacket.SerializeToString())
+					#Receive the player list from the server
+					packet_received = bytearray(socket.recv(2048))
+					playerListPacket.ParseFromString(packet_received)
+					print("---Players---")
+					#Iterate the player_list
+					player_no = 0
+					for player in playerListPacket.player_list:
+						player_no += 1
+						print(str(player_no)+". "+player.name)
 				#Chat packet type
 				if packet_type == 3:
 					#Receive broadcasted data from server
@@ -156,6 +183,8 @@ packet = TcpPacket()
 #Instantiate player
 player_name = input("Enter name: ")
 player = InstantiatePlayer(player_name)
+
+
 
 connectPacket = ConnectPlayerToServer(player, packet)
 Chat(player, packet, connectPacket.lobby_id, connectPacket)
