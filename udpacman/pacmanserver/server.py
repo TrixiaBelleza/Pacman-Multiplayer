@@ -41,7 +41,8 @@ class PacmanServer(threading.Thread, socket.socket):
         print('Starting game.')
 
         while True:
-            print("on going")
+            pass
+            # print("on going")
        
         return
 
@@ -106,8 +107,9 @@ class ClientHandler(threading.Thread, socket.socket):
     #         return cc
 
     def run(self):
-        while True:
-            print("ch on going")
+        #while True:
+        pass  
+            # print("ch on going")
 
     # def update_player_with_client_command(self, cc):
     #     player = None
