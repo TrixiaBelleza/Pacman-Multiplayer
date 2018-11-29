@@ -1,9 +1,8 @@
 #main.py
 
-import backend_chat_module
+# import backend_chat_module
 import gui
 # import 137_gui;
-
 
 window = main()
 window.resizable(width=FALSE, height=FALSE)

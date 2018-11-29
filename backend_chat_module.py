@@ -12,7 +12,7 @@ from player_pb2 import Player
 
 #Connect to socket to server address
 server_address = ('202.92.144.45', 80) 	#address = (hostname, port)
-socket = socket.socket()  # instantiate socket
+socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # instantiate socket
 socket.connect(server_address)  # connect to the server using address 
 
 def CreateLobby(packet):
@@ -86,65 +86,64 @@ def ConnectPlayerToServer(player, packet):
 def Chat(player, packet, lobby_id, connectPacket):
 	#on-going chat room
 	packet_type = 0
-	while True:
-		# maintains a list of possible input streams 
-		sockets_list = [sys.stdin, socket] 
-		'''
-		" There are two possible input situations. Either the 
-		user wants to give manual input to send to other people, 
-		or the server is sending a message to be printed on the 
-		screen. Select returns from sockets_list, the stream that 
-		is reader for input. So for example, if the server wants 
-		to send a message, then the if condition will hold true 
-		below.If the user wants to send a message, the else 
-		condition will evaluate as true"
-		'''
-		#Instantiate chat packet 
-		chatPacket = packet.ChatPacket()
-		#Instantiate disconnect packet
-		disconnectPacket = packet.DisconnectPacket()
-		disconnectPacket.type = TcpPacket.DISCONNECT
-		read_sockets,write_socket,error_socket = select.select(sockets_list,[],[])
-		for socks in read_sockets: 
-			if socks == socket: 
-				packet_received = bytearray(socket.recv(2048))
-				packet.ParseFromString(packet_received)
-				packet_type = packet.type 
-				#Disconnect packet type
-				if packet_type == 0:
-					disconnectPacket.ParseFromString(packet_received)
-					if disconnectPacket.player.name == "":
-						#if the disconnection is normal
-						if disconnectPacket.update == 0:
-							print("You left the game.")
-						else:
-							print("Unknown error occured.\nYou have been disconnected from the game")
-						sys.exit()
-					else :
-						print(disconnectPacket.player.name + " has left the game.")
-				#Connect packet type
-				if packet_type == 1:
-					connectPacket.ParseFromString(packet_received)
-					print(connectPacket.player.name + " has entered the game")
-				#Chat packet type
-				if packet_type == 3:
-					#Receive broadcasted data from server
-					chatPacket.ParseFromString(packet_received)
-					print(chatPacket.player.name+": "+ chatPacket.message) 
-			else: 
-				# #Write your message here
-				chatPacket.type = TcpPacket.CHAT
-				chatPacket.message = sys.stdin.readline()
-				chatPacket.player.name = player_name
-				chatPacket.lobby_id = lobby_id
-			
-				socket.send(chatPacket.SerializeToString())
+	# maintains a list of possible input streams 
+	sockets_list = [sys.stdin, socket] 
+	'''
+	" There are two possible input situations. Either the 
+	user wants to give manual input to send to other people, 
+	or the server is sending a message to be printed on the 
+	screen. Select returns from sockets_list, the stream that 
+	is reader for input. So for example, if the server wants 
+	to send a message, then the if condition will hold true 
+	below.If the user wants to send a message, the else 
+	condition will evaluate as true"
+	'''
+	#Instantiate chat packet 
+	chatPacket = packet.ChatPacket()
+	#Instantiate disconnect packet
+	disconnectPacket = packet.DisconnectPacket()
+	disconnectPacket.type = TcpPacket.DISCONNECT
+	read_sockets,write_socket,error_socket = select.select(sockets_list,[],[])
+	for socks in read_sockets: 
+		if socks == socket: 
+			packet_received = bytearray(socket.recv(2048))
+			packet.ParseFromString(packet_received)
+			packet_type = packet.type 
+			#Disconnect packet type
+			if packet_type == 0:
+				disconnectPacket.ParseFromString(packet_received)
+				if disconnectPacket.player.name == "":
+					#if the disconnection is normal
+					if disconnectPacket.update == 0:
+						print("You left the game.")
+					else:
+						print("Unknown error occured.\nYou have been disconnected from the game")
+					sys.exit()
+				else :
+					print(disconnectPacket.player.name + " has left the game.")
+			#Connect packet type
+			if packet_type == 1:
+				connectPacket.ParseFromString(packet_received)
+				print(connectPacket.player.name + " has entered the game")
+			#Chat packet type
+			if packet_type == 3:
+				#Receive broadcasted data from server
+				chatPacket.ParseFromString(packet_received)
+				print(chatPacket.player.name+": "+ chatPacket.message) 
+		else: 
+			# #Write your message here
+			chatPacket.type = TcpPacket.CHAT
+			chatPacket.message = sys.stdin.readline()
+			chatPacket.player.name = player_name
+			chatPacket.lobby_id = lobby_id
+		
+			socket.send(chatPacket.SerializeToString())
 
-				if chatPacket.message.strip() == "bye":
-					disconnectPacket.type = TcpPacket.DISCONNECT
+			if chatPacket.message.strip() == "bye":
+				disconnectPacket.type = TcpPacket.DISCONNECT
 
-					disconnectPacket.player.name = player_name
-					socket.send(disconnectPacket.SerializeToString())
+				disconnectPacket.player.name = player_name
+				socket.send(disconnectPacket.SerializeToString())
 
 #######################################################################
 #								MAIN                				  #
@@ -158,5 +157,6 @@ player_name = input("Enter name: ")
 player = InstantiatePlayer(player_name)
 
 connectPacket = ConnectPlayerToServer(player, packet)
-Chat(player, packet, connectPacket.lobby_id, connectPacket)
+while True:
+	Chat(player, packet, connectPacket.lobby_id, connectPacket)
 socket.close() 
