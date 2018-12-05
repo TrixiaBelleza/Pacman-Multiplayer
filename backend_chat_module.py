@@ -10,18 +10,21 @@ import select
 from tcp_packet_pb2 import TcpPacket
 from player_pb2 import Player
 
-#Connect to socket to server address
-server_address = ('202.92.144.45', 80) 	#address = (hostname, port)
-socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # instantiate socket
-socket.connect(server_address)  # connect to the server using address 
-
-def CreateLobby(packet):
+def ConnectToServer():
+	#Connect to socket to server address
+	global socket
+	server_address = ('202.92.144.45', 80) 	#address = (hostname, port)
+	socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # instantiate socket
+	socket.connect(server_address)  # connect to the server using address 
+	print("Socket connected to server!")
+	return socket
+def CreateLobby(packet, max_players):
 	#CREATE LOBBY
 
 	#Instantiate Create Lobby using the packet.type = CREATE_LOBBY from TcpPacket, which is 2. (check tcp_packet.proto)
 	lobbyPacket = packet.CreateLobbyPacket()
 	lobbyPacket.type = TcpPacket.CREATE_LOBBY
-	lobbyPacket.max_players = int(input("Enter max number of players: "))
+	lobbyPacket.max_players = max_players
 	
 	#Send the lobbyPacket to server
 	socket.send(lobbyPacket.SerializeToString()) 
@@ -39,49 +42,103 @@ def InstantiatePlayer(player_name):
 	player.name = player_name
 	return player
 
-#Connect players (including host) to server using connectPacket	
-def ConnectPlayerToServer(player, packet):
+
+#Connect host to server using connectPacket	
+def ConnectHostToServer(player, packet, max_players):
 	connectPacket = packet.ConnectPacket()
 
-	role = input("Are you a HOST(H) or a PLAYER(P)? : ").lower()
+	connectPacket.type = TcpPacket.CONNECT
+	lobby_id = CreateLobby(packet, max_players)
+	connectPacket.lobby_id = lobby_id
+	connectPacket.player.name = player.name
+	#Send connect packet to server
+	socket.send(connectPacket.SerializeToString()) 
 
-	if role == "h":
-		connectPacket.type = TcpPacket.CONNECT
-		lobby_id = CreateLobby(packet)
-		connectPacket.lobby_id = lobby_id
-		connectPacket.player.name = player.name
-		#Send connect packet to server
-		socket.send(connectPacket.SerializeToString()) 
+	#Receive broadcasted data from server
+	connect_data = bytearray(socket.recv(1024)) # receive response from server
+	connectPacket.ParseFromString(connect_data)
 
-		#Receive broadcasted data from server
-		connect_data = bytearray(socket.recv(1024)) # receive response from server
-		connectPacket.ParseFromString(connect_data)
-	else:
-		connectPacket.type = TcpPacket.ERR_LDNE
-		#assume first that the connectPacket type is error packet so that all can be put inside a try catch
-		#and loop until the lobby chosen is existing or is not full
-		while connectPacket.type == TcpPacket.ERR_LDNE or connectPacket.type == TcpPacket.ERR_LFULL:
-			try:
-				lobby_id = input("Enter lobby id: ") 
-				connectPacket.type = TcpPacket.CONNECT
-				connectPacket.lobby_id = lobby_id
-				connectPacket.player.name = player.name
-				#Send connect packet to server
-				socket.send(connectPacket.SerializeToString()) 
-				#Receive broadcasted data from server
-				connect_data = bytearray(socket.recv(1024)) # receive response from server
-				connectPacket.ParseFromString(connect_data)
-				#if the received response from the server is ERR_LFULL, 
-				#parsing connect_data will NOT result to exception
-				if connectPacket.type == TcpPacket.ERR_LFULL:
-					print("Lobby is full!\n")
-				#if the received response from server is ERR_LDNE, 
-				#parsing connect_data will result to an exception hence going inside except block
-			except:
-				if connectPacket.type == TcpPacket.ERR_LDNE:
-					print("Lobby does not exist!\n")
 	print('Received from server: ' + str(connectPacket))  # show in terminal
 	return connectPacket
+
+#Connect players (including host) to server using connectPacket	
+def ConnectPlayerToServer(player, packet, lobby_id):
+	connectPacket = packet.ConnectPacket()
+
+	connectPacket.type = TcpPacket.ERR_LDNE
+	#assume first that the connectPacket type is error packet so that all can be put inside a try catch
+	#and loop until the lobby chosen is existing or is not full
+	while connectPacket.type == TcpPacket.ERR_LDNE or connectPacket.type == TcpPacket.ERR_LFULL:
+		try:
+			# lobby_id = input("Enter lobby id: ") 
+			connectPacket.type = TcpPacket.CONNECT
+			connectPacket.lobby_id = lobby_id
+			connectPacket.player.name = player.name
+			#Send connect packet to server
+			socket.send(connectPacket.SerializeToString()) 
+			#Receive broadcasted data from server
+			connect_data = bytearray(socket.recv(1024)) # receive response from server
+
+			time.sleep(3)
+			connectPacket.ParseFromString(connect_data)
+			#if the received response from the server is ERR_LFULL, 
+			#parsing connect_data will NOT result to exception
+			if connectPacket.type == TcpPacket.ERR_LFULL:
+				print("Lobby is full!\n")
+			#if the received response from server is ERR_LDNE, 
+			#parsing connect_data will result to an exception hence going inside except block
+		except:
+			if connectPacket.type == TcpPacket.ERR_LDNE:
+				print("Lobby does not exist!\n")
+	print('Received from server: ' + str(connectPacket))  # show in terminal
+	return connectPacket
+
+# #Connect players (including host) to server using connectPacket	
+# def ConnectHostToServer(player, packet, max_players):
+# 	connectPacket = packet.ConnectPacket()
+	
+# 	connectPacket.type = TcpPacket.CONNECT
+# 	lobby_id = CreateLobby(packet)
+# 	connectPacket.lobby_id = lobby_id
+# 	connectPacket.player.name = player.name
+# 	#Send connect packet to server
+# 	socket.send(connectPacket.SerializeToString()) 
+
+# 	#Receive broadcasted data from server
+# 	connect_data = bytearray(socket.recv(1024)) # receive response from server
+# 	connectPacket.ParseFromString(connect_data)
+
+# def ConnectPlayerToServer(player, packet, role):
+
+
+# 	if role == "h":
+		
+# 	else:
+# 		connectPacket.type = TcpPacket.ERR_LDNE
+# 		#assume first that the connectPacket type is error packet so that all can be put inside a try catch
+# 		#and loop until the lobby chosen is existing or is not full
+# 		while connectPacket.type == TcpPacket.ERR_LDNE or connectPacket.type == TcpPacket.ERR_LFULL:
+# 			try:
+# 				lobby_id = input("Enter lobby id: ") 
+# 				connectPacket.type = TcpPacket.CONNECT
+# 				connectPacket.lobby_id = lobby_id
+# 				connectPacket.player.name = player.name
+# 				#Send connect packet to server
+# 				socket.send(connectPacket.SerializeToString()) 
+# 				#Receive broadcasted data from server
+# 				connect_data = bytearray(socket.recv(1024)) # receive response from server
+# 				connectPacket.ParseFromString(connect_data)
+# 				#if the received response from the server is ERR_LFULL, 
+# 				#parsing connect_data will NOT result to exception
+# 				if connectPacket.type == TcpPacket.ERR_LFULL:
+# 					print("Lobby is full!\n")
+# 				#if the received response from server is ERR_LDNE, 
+# 				#parsing connect_data will result to an exception hence going inside except block
+# 			except:
+# 				if connectPacket.type == TcpPacket.ERR_LDNE:
+# 					print("Lobby does not exist!\n")
+# 	print('Received from server: ' + str(connectPacket))  # show in terminal
+# 	return connectPacket
 
 def Chat(player, packet, lobby_id, connectPacket):
 	#on-going chat room
@@ -149,14 +206,16 @@ def Chat(player, packet, lobby_id, connectPacket):
 #								MAIN                				  #
 #######################################################################
 
-#Instantiate packet
-packet = TcpPacket()
+# ConnectToServer()
+# # Instantiate packet
+# packet = TcpPacket()
 
-#Instantiate player
-player_name = input("Enter name: ")
-player = InstantiatePlayer(player_name)
+# #Instantiate player
+# player_name = input("Enter name: ")
+# player = InstantiatePlayer(player_name)
+# role = input("Are you a HOST(H) or a PLAYER(P)? : ").lower()
 
-connectPacket = ConnectPlayerToServer(player, packet)
-while True:
-	Chat(player, packet, connectPacket.lobby_id, connectPacket)
-socket.close() 
+# connectPacket = ConnectPlayerToServer(player, packet, role)
+# while True:
+# 	Chat(player, packet, connectPacket.lobby_id, connectPacket)
+# socket.close() 
