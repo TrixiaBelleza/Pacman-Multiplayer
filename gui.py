@@ -1,9 +1,103 @@
 # import backend_chat
 import tkinter
 from tkinter import *
-from tkinter import messagebox
-
+from tkinter import messagebox, simpledialog
+from tcp_packet_pb2 import TcpPacket
+from player_pb2 import Player
+import select
+import socket
 # MAIN WINDOW FUNCTIONS =============================================================================================
+# global socket
+server_address = ('202.92.144.45', 80) 	#address = (hostname, port)
+socket = socket.socket()  # instantiate socket
+socket.connect(server_address)  # connect to the server using address 
+
+################ BACKEND ################################################
+
+def ConnectToServer():
+	#Connect to socket to server address
+	global socket
+	server_address = ('202.92.144.45', 80) 	#address = (hostname, port)
+	socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # instantiate socket
+	socket.connect(server_address)  # connect to the server using address 
+	print("Socket connected to server!")
+	return socket
+def CreateLobby(packet, max_players):
+	#CREATE LOBBY
+
+	#Instantiate Create Lobby using the packet.type = CREATE_LOBBY from TcpPacket, which is 2. (check tcp_packet.proto)
+	lobbyPacket = packet.CreateLobbyPacket()
+	lobbyPacket.type = TcpPacket.CREATE_LOBBY
+	lobbyPacket.max_players = max_players
+	
+	#Send the lobbyPacket to server
+	socket.send(lobbyPacket.SerializeToString()) 
+	
+	#Receive lobby id from server
+	data = bytearray(socket.recv(1024)) # receive response from server
+	lobbyPacket.ParseFromString(data)
+	print('Received from server: ' + lobbyPacket.lobby_id)  # show in terminal
+	lobby_id = lobbyPacket.lobby_id
+
+	return lobby_id
+
+def InstantiatePlayer(player_name):
+	player = Player()
+	player.name = player_name
+	return player
+
+#Connect host to server using connectPacket	
+def ConnectHostToServer(player, packet, max_players):
+	connectPacket = packet.ConnectPacket()
+
+	connectPacket.type = TcpPacket.CONNECT
+	lobby_id = CreateLobby(packet, max_players)
+	connectPacket.lobby_id = lobby_id
+	connectPacket.player.name = player.name
+	#Send connect packet to server
+	socket.send(connectPacket.SerializeToString()) 
+
+	#Receive broadcasted data from server
+	connect_data = bytearray(socket.recv(1024)) # receive response from server
+	connectPacket.ParseFromString(connect_data)
+
+	print('Received from server: ' + str(connectPacket))  # show in terminal
+	return connectPacket
+
+#Connect players (including host) to server using connectPacket	
+def ConnectPlayerToServer(player, packet, lobby_id):
+	connectPacket = packet.ConnectPacket()
+
+	connectPacket.type = TcpPacket.ERR_LDNE
+	#assume first that the connectPacket type is error packet so that all can be put inside a try catch
+	#and loop until the lobby chosen is existing or is not full
+	while connectPacket.type == TcpPacket.ERR_LDNE or connectPacket.type == TcpPacket.ERR_LFULL:
+		try:
+			# lobby_id = input("Enter lobby id: ") 
+			connectPacket.type = TcpPacket.CONNECT
+			connectPacket.lobby_id = lobby_id
+			connectPacket.player.name = player.name
+			#Send connect packet to server
+			socket.send(connectPacket.SerializeToString()) 
+			#Receive broadcasted data from server
+			connect_data = bytearray(socket.recv(1024)) # receive response from server
+
+			time.sleep(3)
+			connectPacket.ParseFromString(connect_data)
+			#if the received response from the server is ERR_LFULL, 
+			#parsing connect_data will NOT result to exception
+			if connectPacket.type == TcpPacket.ERR_LFULL:
+				print("Lobby is full!\n")
+			#if the received response from server is ERR_LDNE, 
+			#parsing connect_data will result to an exception hence going inside except block
+		except:
+			if connectPacket.type == TcpPacket.ERR_LDNE:
+				print("Lobby does not exist!\n")
+	print('Received from server: ' + str(connectPacket))  # show in terminal
+	return connectPacket
+
+#############################################################################################
+
 
 def pacman_window():
 	tk_window = tkinter.Tk()
@@ -33,12 +127,31 @@ def exit_Game():
 	if prompt == True:
 		window.destroy()
 
-
 # GETS PLAYER'chat_scrollbar NAME ================================================================================================
+def getPlayerType():
+	player_type = messagebox.askquestion("USER TYPE", "Are you the host?\nPress YES if you are the host. NO if you're just a player.")
+	if player_type == "yes":
+		player_type = "h"
+	else:
+		player_type = "p"
+	return player_type
 
 def btn_ok(event=None):
 	if name_Entry.get().isalnum():
-		game_map(chosen_map)
+		#instantiate player
+		player =  InstantiatePlayer(name_Entry.get())
+		#instantiate packet
+		packet = TcpPacket()
+		if getPlayerType() == "h":
+			max_players = simpledialog.askinteger("Max Players", "Enter max number of players", parent=name_Frm)
+			connectPacket =  ConnectHostToServer(player,packet,max_players)
+			lobby_id = connectPacket.lobby_id
+
+		else:
+			lobby_id = simpledialog.askstring("Lobby ID", "Enter lobby ID", parent=name_Frm)
+			connectPacket =  ConnectPlayerToServer(player, packet, lobby_id)
+		
+		game_map(chosen_map, player, packet, lobby_id, connectPacket)
 		name_Frm.pack_forget()
 	else:
 		L = Label(name_Frm, text="Invalid name. Must consist of \nletters and numbers only.", bg="BLACK", fg="RED")
@@ -74,7 +187,7 @@ def get_name(map_selected):
 
 # GAME ENVIRONMENT ==================================================================================================
 
-def game_map(chosen_map):
+def game_map(chosen_map, player, packet, lobby_id, connectPacket):
 
 	# MAP FRAME ---------------------------------------------------------------
 	global map_Frame
@@ -123,7 +236,7 @@ def game_map(chosen_map):
 	# CHAT ENTRY FRAME --------------------------------------------------------
 	global entry_Frm
 	entry_Frm = Frame(window, bg="BLACK", height=50, width=400)
-	chat_entry()
+	chat_entry(player, packet, lobby_id, connectPacket)
 
 	optionsFrm.pack()
 	map_Frame.pack()
@@ -224,23 +337,96 @@ def chat_history():
 	chat_history_Txt.config(yscrollcommand=chat_scrollbar.set)
 	chat_history_Txt.config(state=DISABLED)
 
-def chat_entry():
+def process(data):
+    print("processing: {0}".format(data))
+
+def entry_callback(event):
+    print("entry")
+    process(event.widget.get())
+
+def chat_entry(player, packet, lobby_id, connectPacket):
 	global chat_entry
 	chat_entry = Entry(entry_Frm, width=42)
 	chat_entry.focus_set()
-	chat_entry.bind("<Return>", get_chat_entry)
+	chat_entry.bind("<Return>", lambda x: get_chat_entry(player,packet,lobby_id, connectPacket))
+	
 	chat_entry.grid(column=0, row=0)
-
-	enter_chat_btn = Button(entry_Frm, text="Enter", command=get_chat_entry, pady=0)
+	enter_chat_btn = Button(entry_Frm, text="Enter", command=lambda x : get_chat_entry(player,packet,lobby_id, connectPacket), pady=0)
 	enter_chat_btn.grid(column=1, row=0)
 
-def get_chat_entry(event=None):
-	chat_history_Txt.config(state=NORMAL)
-	chat_history_Txt.insert(END, chat_entry.get() + '\n')
-	chat_history_Txt.see("end")
-	chat_history_Txt.config(state=DISABLED)
-	chat_entry.delete(0,len(chat_entry.get()))
+def get_chat_entry(player, packet, lobby_id, connectPacket, event=None):
+	# maintains a list of possible input streams 
+	sockets_list = [sys.stdin, socket] 
+	#Instantiate chat packet 
+	chatPacket = packet.ChatPacket()
+	#Instantiate disconnect packet
+	disconnectPacket = packet.DisconnectPacket()
+	disconnectPacket.type = TcpPacket.DISCONNECT
+	read_sockets,write_socket,error_socket = select.select(sockets_list,[],[])
 
+	for socks in read_sockets: 
+		if socks == socket: 
+			packet_received = bytearray(socket.recv(2048))
+			packet.ParseFromString(packet_received)
+			packet_type = packet.type 
+			#Disconnect packet type
+			if packet_type == 0:
+				disconnectPacket.ParseFromString(packet_received)
+				if disconnectPacket.player.name == "":
+					#if the disconnection is normal
+					if disconnectPacket.update == 0:
+						print("You left the game.")
+					else:
+						print("Unknown error occured.\nYou have been disconnected from the game")
+					sys.exit()
+				else :
+					print(disconnectPacket.player.name + " has left the game.")
+			#Connect packet type
+			if packet_type == 1:
+				connectPacket.ParseFromString(packet_received)
+				print(connectPacket.player.name + " has entered the game")
+			#Chat packet type
+			if packet_type == 3:
+				
+				chat_history_Txt.config(state=NORMAL)
+				chat_history_Txt.insert(END, chatPacket.message + '\n')
+				chat_history_Txt.see("end")
+				chat_history_Txt.config(state=DISABLED)
+				#Receive broadcasted data from server
+				chatPacket.ParseFromString(packet_received)
+				print(chatPacket.player.name+": "+ chatPacket.message) 
+				
+				chat_entry.delete(0,len(chat_entry.get()))
+		else: 
+			# #Write your message here
+			chatPacket.type = TcpPacket.CHAT
+			chatPacket.message = chat_entry.get()
+			chatPacket.player.name = player.name
+			chatPacket.lobby_id = lobby_id
+			
+			chat_history_Txt.config(state=NORMAL)
+			chat_history_Txt.insert(END, chatPacket.message + '\n')
+			chat_history_Txt.see("end")
+			chat_history_Txt.config(state=DISABLED)
+
+			socket.send(chatPacket.SerializeToString())
+
+			packet_received = bytearray(socket.recv(2048))
+			packet.ParseFromString(packet_received)
+			packet_type = packet.type
+
+			if packet_type == 3:
+				chatPacket.ParseFromString(packet_received)
+				print(chatPacket.player.name+": "+ chatPacket.message) 
+
+			if chatPacket.message.strip() == "bye":
+				disconnectPacket.type = TcpPacket.DISCONNECT
+				disconnectPacket.player.name = player.name
+				socket.send(disconnectPacket.SerializeToString())
+
+			chat_entry.delete(0,len(chat_entry.get()))
+
+	return chat_entry.get()
 
 # BACK TO MAIN MENU PROMPT
 def back():
