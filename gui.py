@@ -345,75 +345,59 @@ def entry_callback(event):
     print("entry")
     process(event.widget.get())
 def chat_process(player, packet, lobby_id, connectPacket):
-	if len(message_list)>0:
+	#THIS FUNCTION CONTINUOUSLY RECEIVE PACKET FROM THE SERVER IF THERE IS ANY
+
+	sockets_list = [sys.stdin, socket] 
+	#Instantiate chat packet 
+	chatPacket = packet.ChatPacket()
+	#Instantiate disconnect packet
+	disconnectPacket = packet.DisconnectPacket()
+
+	disconnectPacket.type = TcpPacket.DISCONNECT
+	read_sockets,write_socket,error_socket = select.select(sockets_list,[],[],0)
+	for socks in read_sockets: 
+		packet_received = bytearray(socket.recv(2048))
+		packet.ParseFromString(packet_received)
+		packet_type = packet.type 
+		if packet_type == 0:
+			disconnectPacket.ParseFromString(packet_received)
+			if disconnectPacket.player.name == "":
+				#if the disconnection is normal
+				if disconnectPacket.update == 0:
+					print("You left the game.")
+				else:
+					print("Unknown error occured.\nYou have been disconnected from the game")
+				sys.exit()
+			else :
+				print(disconnectPacket.player.name + " has left the game.")
+		#Connect packet type
+		if packet_type == 1:
+			connectPacket.ParseFromString(packet_received)
+			print(connectPacket.player.name + " has entered the game")
+		#Chat packet type
+		if packet_type == 3:
+			#Receive broadcasted data from server
+			chatPacket.ParseFromString(packet_received)
+			print(chatPacket.player.name+": "+ chatPacket.message) 
+
+			chat_history_Txt.config(state=NORMAL)
+			chat_history_Txt.insert(END, chatPacket.message + '\n')
+			chat_history_Txt.see("end")
+			chat_history_Txt.config(state=DISABLED)
+
+		if chatPacket.message.strip() == "bye":
+			disconnectPacket.type = TcpPacket.DISCONNECT
+			disconnectPacket.player.name = player.name
+			socket.send(disconnectPacket.SerializeToString())
+
+		chat_entry.delete(0,len(chat_entry.get()))
 		
-		sockets_list = [sys.stdin, socket] 
-		#Instantiate chat packet 
-		chatPacket = packet.ChatPacket()
-		#Instantiate disconnect packet
-		disconnectPacket = packet.DisconnectPacket()
-
-		disconnectPacket.type = TcpPacket.DISCONNECT
-		read_sockets,write_socket,error_socket = select.select(sockets_list,[],[],0)
-		for socks in read_sockets: 
-			#Disconnect packet type
-			# #Write your message here
-			#chatPacket.type = TcpPacket.CHAT
-			#chatPacket.message = message_list[len(message_list)-1]
-			#chatPacket.player.name = player.name
-			#chatPacket.lobby_id = lobby_id
-			
-			#socket.send(chatPacket.SerializeToString())
-
-			packet_received = bytearray(socket.recv(2048))
-			packet.ParseFromString(packet_received)
-			packet_type = packet.type 
-
-
-			if packet_type == 0:
-				disconnectPacket.ParseFromString(packet_received)
-				if disconnectPacket.player.name == "":
-					#if the disconnection is normal
-					if disconnectPacket.update == 0:
-						print("You left the game.")
-					else:
-						print("Unknown error occured.\nYou have been disconnected from the game")
-					sys.exit()
-				else :
-					print(disconnectPacket.player.name + " has left the game.")
-			#Connect packet type
-			if packet_type == 1:
-				connectPacket.ParseFromString(packet_received)
-				print(connectPacket.player.name + " has entered the game")
-			#Chat packet type
-			if packet_type == 3:
-				#Receive broadcasted data from server
-				chatPacket.ParseFromString(packet_received)
-				print(chatPacket.player.name+": "+ chatPacket.message) 
-
-				chat_history_Txt.config(state=NORMAL)
-				chat_history_Txt.insert(END, chatPacket.message + '\n')
-				chat_history_Txt.see("end")
-				chat_history_Txt.config(state=DISABLED)
-
-				
-				
-			if chatPacket.message.strip() == "bye":
-				disconnectPacket.type = TcpPacket.DISCONNECT
-				disconnectPacket.player.name = player.name
-				socket.send(disconnectPacket.SerializeToString())
-
-			chat_entry.delete(0,len(chat_entry.get()))
-		
-
-
+	#LOOP THE FUNCTION
 	window.after(100,chat_process,player, packet, lobby_id, connectPacket)
 
 
 def chat_entry(player, packet, lobby_id, connectPacket):
 	global chat_entry
-	global message_list
-	message_list = []
 	chat_entry = Entry(entry_Frm, width=42)
 	chat_entry.focus_set()
 	chat_entry.bind("<Return>", lambda x: get_chat_entry(player,packet,lobby_id, connectPacket))
@@ -425,6 +409,7 @@ def chat_entry(player, packet, lobby_id, connectPacket):
 	enter_chat_btn.grid(column=1, row=0)
 	chat_process(player, packet, lobby_id, connectPacket)
 def get_chat_entry(player, packet, lobby_id, connectPacket, event=None):
+	#THIS FUNCTION SEND PACKET TO SERVER IF THE PLAYER ENTERED A MESSAGE
 	# maintains a list of possible input streams 
 	sockets_list = [sys.stdin, socket]
 	chatPacket = packet.ChatPacket()
@@ -433,10 +418,8 @@ def get_chat_entry(player, packet, lobby_id, connectPacket, event=None):
 	chatPacket.message = chat_entry.get()
 	chatPacket.player.name = player.name
 	chatPacket.lobby_id = lobby_id
-	
+	#send chatPacket to server	
 	socket.send(chatPacket.SerializeToString())
-
-	message_list.append(chat_entry.get())
 
 	return chat_entry.get()
 
