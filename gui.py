@@ -419,6 +419,12 @@ def chat_entry(player, packet, lobby_id, connectPacket):
 
 	enter_chat_btn.grid(column=1, row=0)
 	chat_process(player, packet, lobby_id, connectPacket)
+
+	chat_history_Txt.config(state=NORMAL)
+	chat_history_Txt.insert(END, "You entered the game" + '\n')
+	chat_history_Txt.see("end")
+	chat_history_Txt.config(state=DISABLED)
+	
 def get_chat_entry(player, packet, lobby_id, connectPacket, event=None):
 	# maintains a list of possible input streams 
 	sockets_list = [sys.stdin, socket]
