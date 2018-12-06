@@ -94,6 +94,7 @@ def ConnectPlayerToServer(player, packet, lobby_id):
 			if connectPacket.type == TcpPacket.ERR_LDNE:
 				print("Lobby does not exist!\n")
 	print('Received from server: ' + str(connectPacket))  # show in terminal
+	print(connectPacket.player.name + " has entered the game")
 	return connectPacket
 
 #############################################################################################
@@ -151,6 +152,7 @@ def btn_ok(event=None):
 			lobby_id = simpledialog.askstring("Lobby ID", "Enter lobby ID", parent=name_Frm)
 			connectPacket =  ConnectPlayerToServer(player, packet, lobby_id)
 		
+
 		game_map(chosen_map, player, packet, lobby_id, connectPacket)
 		name_Frm.pack_forget()
 	else:
@@ -237,8 +239,6 @@ def game_map(chosen_map, player, packet, lobby_id, connectPacket):
 	global entry_Frm
 	entry_Frm = Frame(window, bg="BLACK", height=50, width=400)
 	chat_entry(player, packet, lobby_id, connectPacket)
-
-
 	optionsFrm.pack()
 	map_Frame.pack()
 	chat_history_Frm.pack()
@@ -344,34 +344,23 @@ def process(data):
 def entry_callback(event):
     print("entry")
     process(event.widget.get())
+def chat_process(player, packet, lobby_id, connectPacket):
+	if len(message_list)>0:
+		
+		sockets_list = [sys.stdin, socket] 
+		#Instantiate chat packet 
+		chatPacket = packet.ChatPacket()
+		#Instantiate disconnect packet
+		disconnectPacket = packet.DisconnectPacket()
 
-def chat_entry(player, packet, lobby_id, connectPacket):
-	global chat_entry
-	chat_entry = Entry(entry_Frm, width=42)
-	chat_entry.focus_set()
-	chat_entry.bind("<Return>", lambda x: get_chat_entry(player,packet,lobby_id, connectPacket))
-	
-	chat_entry.grid(column=0, row=0)
-	enter_chat_btn = Button(entry_Frm, text="Enter", command=lambda x : get_chat_entry(player,packet,lobby_id, connectPacket), pady=0)
-	enter_chat_btn.grid(column=1, row=0)
+		disconnectPacket.type = TcpPacket.DISCONNECT
+		read_sockets,write_socket,error_socket = select.select(sockets_list,[],[],0)
+		for socks in read_sockets: 
 
-def get_chat_entry(player, packet, lobby_id, connectPacket, event=None):
-	global chatPacket
-	# maintains a list of possible input streams 
-	sockets_list = [sys.stdin, socket] 
-	#Instantiate chat packet 
-	chatPacket = packet.ChatPacket()
-	#Instantiate disconnect packet
-	disconnectPacket = packet.DisconnectPacket()
-	disconnectPacket.type = TcpPacket.DISCONNECT
-	read_sockets,write_socket,error_socket = select.select(sockets_list,[],[])
-
-	for socks in read_sockets: 
-		if socks == socket: 
 			packet_received = bytearray(socket.recv(2048))
 			packet.ParseFromString(packet_received)
 			packet_type = packet.type 
-			#Disconnect packet type
+
 			if packet_type == 0:
 				disconnectPacket.ParseFromString(packet_received)
 				if disconnectPacket.player.name == "":
@@ -389,39 +378,57 @@ def get_chat_entry(player, packet, lobby_id, connectPacket, event=None):
 				print(connectPacket.player.name + " has entered the game")
 			#Chat packet type
 			if packet_type == 3:
-
+				#Receive broadcasted data from server
 				chatPacket.ParseFromString(packet_received)
 				print(chatPacket.player.name+": "+ chatPacket.message) 
 
-		else: 
-			# #Write your message here
-			chatPacket.type = TcpPacket.CHAT
-			chatPacket.message = chat_entry.get()
-			chatPacket.player.name = player.name
-			chatPacket.lobby_id = lobby_id
+				chat_history_Txt.config(state=NORMAL)
+				chat_history_Txt.insert(END, chatPacket.player.name+ ':' + chatPacket.message + '\n')
+				chat_history_Txt.see("end")
+				chat_history_Txt.config(state=DISABLED)
 
-			socket.send(chatPacket.SerializeToString())
-
-			packet_received = bytearray(socket.recv(2048))
-			packet.ParseFromString(packet_received)
-			packet_type = packet.type
-
-			if packet_type == 3:
-				chatPacket.ParseFromString(packet_received)
-				print(chatPacket.player.name+": "+ chatPacket.message) 
-
+				
+				
 			if chatPacket.message.strip() == "bye":
 				disconnectPacket.type = TcpPacket.DISCONNECT
 				disconnectPacket.player.name = player.name
 				socket.send(disconnectPacket.SerializeToString())
 
+			chat_entry.delete(0,len(chat_entry.get()))
+		
 
-		chat_history_Txt.config(state=NORMAL)
-		chat_history_Txt.insert(END, chatPacket.message + '\n')
-		chat_history_Txt.see("end")
-		chat_history_Txt.config(state=DISABLED)
 
-		chat_entry.delete(0,len(chat_entry.get()))
+	window.after(100,chat_process,player, packet, lobby_id, connectPacket)
+
+
+def chat_entry(player, packet, lobby_id, connectPacket):
+	global chat_entry
+	global message_list
+	message_list = []
+	chat_entry = Entry(entry_Frm, width=42)
+	chat_entry.focus_set()
+	chat_entry.bind("<Return>", lambda x: get_chat_entry(player,packet,lobby_id, connectPacket))
+	
+	chat_entry.grid(column=0, row=0)
+
+	enter_chat_btn = Button(entry_Frm, text="Enter", command=lambda x : get_chat_entry(player,packet,lobby_id, connectPacket), pady=0)
+
+	enter_chat_btn.grid(column=1, row=0)
+	chat_process(player, packet, lobby_id, connectPacket)
+def get_chat_entry(player, packet, lobby_id, connectPacket, event=None):
+	# maintains a list of possible input streams 
+	sockets_list = [sys.stdin, socket]
+	chatPacket = packet.ChatPacket()
+
+	chatPacket.type = TcpPacket.CHAT
+	chatPacket.message = chat_entry.get()
+	chatPacket.player.name = player.name
+	chatPacket.lobby_id = lobby_id
+	
+	socket.send(chatPacket.SerializeToString())
+
+	message_list.append(chat_entry.get())
+
 	return chat_entry.get()
 
 # BACK TO MAIN MENU PROMPT

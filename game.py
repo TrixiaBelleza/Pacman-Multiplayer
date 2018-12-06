@@ -465,4 +465,7 @@ window.mainloop()
 
 # FOR REFERENCE, PLEASE READ:
 # Shipman, John W. "Tkinter 8.5 reference: a GUI for." 31 December 2013. New Mexico Tech Computer Center. Web / PDF.
+<<<<<<< HEAD
 
+=======
+>>>>>>> ced8a96107c626e978a6abfc44b6c04b213c84f8
