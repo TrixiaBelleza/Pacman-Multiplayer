@@ -69,7 +69,6 @@ def ConnectPlayerToServer(player, packet, lobby_id):
 	#assume first that the connectPacket type is error packet so that all can be put inside a try catch
 	#and loop until the lobby chosen is existing or is not full
 	while connectPacket.type == TcpPacket.ERR_LDNE or connectPacket.type == TcpPacket.ERR_LFULL:
-		print("SLEEP")
 		try:
 			# lobby_id = input("Enter lobby id: ") 
 			connectPacket.type = TcpPacket.CONNECT
@@ -82,7 +81,6 @@ def ConnectPlayerToServer(player, packet, lobby_id):
 
 			time.sleep(3)
 			connectPacket.ParseFromString(connect_data)
-			print(connectPacket)
 			#if the received response from the server is ERR_LFULL, 
 			#parsing connect_data will NOT result to exception
 			if connectPacket.type == TcpPacket.ERR_LFULL:
