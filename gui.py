@@ -104,7 +104,7 @@ def pacman_window():
 	tk_window = tkinter.Tk()
 	tk_window.title("BATTLE OF THE PACMEN")
 	w = 500 # height for tk_window
-	h = 500 # height for tk_window
+	h = 650 # height for tk_window
 	x = (tk_window.winfo_screenwidth()/2) - (w/2) # calculate x and y coordinates for tk_window
 	y = (tk_window.winfo_screenheight()/2) - (h/2)
 	# set the dimensions of the screen and where it is placed
@@ -200,9 +200,11 @@ def game_map(chosen_map, player, packet, lobby_id, connectPacket):
 		map_template = open("map1.txt", "r")
 		map_name = "Map 1"
 	if chosen_map == 2:
-		map_name = "Map 3"
+		map_template = open("map2.txt", "r")
+		map_name = "Map 2"
 	if chosen_map == 3:
-		map_name = "Easy 3"
+		map_template = open("map3.txt", "r")
+		map_name = "Map 3"
 
 	if map_template == None:
 		messagebox.showerror("ERROR", "File not found.")
@@ -409,7 +411,7 @@ def chat_process(player, packet, lobby_id, connectPacket):
 
 def chat_entry(player, packet, lobby_id, connectPacket):
 	global chat_entry
-	chat_entry = Entry(entry_Frm, width=42)
+	chat_entry = Entry(entry_Frm, width=47)
 	chat_entry.focus_set()
 	chat_entry.bind("<Return>", lambda x: get_chat_entry(player,packet,lobby_id, connectPacket))
 	
