@@ -65,36 +65,38 @@ def ConnectHostToServer(player, packet, max_players):
 	return connectPacket
 
 #Connect players (including host) to server using connectPacket	
-def ConnectPlayerToServer(player, packet, lobby_id):
-	connectPacket = packet.ConnectPacket()
+def ConnectPlayerToServer(player, connectPacket, lobby_id):
+	#connectPacket = packet.ConnectPacket()
 
-	connectPacket.type = TcpPacket.ERR_LDNE
+	#connectPacket.type = TcpPacket.ERR_LDNE
 	#assume first that the connectPacket type is error packet so that all can be put inside a try catch
 	#and loop until the lobby chosen is existing or is not full
-	while connectPacket.type == TcpPacket.ERR_LDNE or connectPacket.type == TcpPacket.ERR_LFULL:
-		try:
-			# lobby_id = input("Enter lobby id: ") 
-			connectPacket.type = TcpPacket.CONNECT
-			connectPacket.lobby_id = lobby_id
-			connectPacket.player.name = player.name
-			#Send connect packet to server
-			socket.send(connectPacket.SerializeToString()) 
-			#Receive broadcasted data from server
-			connect_data = bytearray(socket.recv(1024)) # receive response from server
-
-			time.sleep(3)
-			connectPacket.ParseFromString(connect_data)
-			#if the received response from the server is ERR_LFULL, 
-			#parsing connect_data will NOT result to exception
-			if connectPacket.type == TcpPacket.ERR_LFULL:
-				print("Lobby is full!\n")
-			#if the received response from server is ERR_LDNE, 
-			#parsing connect_data will result to an exception hence going inside except block
-		except:
-			if connectPacket.type == TcpPacket.ERR_LDNE:
-				print("Lobby does not exist!\n")
-	print('Received from server: ' + str(connectPacket))  # show in terminal
-	print(connectPacket.player.name + " has entered the game")
+	
+	# lobby_id = input("Enter lobby id: ") 
+	connectPacket.type = TcpPacket.CONNECT
+	connectPacket.lobby_id = lobby_id
+	connectPacket.player.name = player.name
+	#Send connect packet to server
+	socket.send(connectPacket.SerializeToString()) 
+	#Receive broadcasted data from server
+	connect_data = bytearray(socket.recv(1024)) # receive response from server
+	
+	try:
+		connectPacket.ParseFromString(connect_data)
+	except:
+		return connectPacket	
+		#if connectPacket.type == TcpPacket.ERR_LDNE:
+		#	print("Lobby does not exist!\n")
+		
+	#if connectPacket.type == TcpPacket.ERR_LFULL:
+		#print("Lobby is full!\n")
+	#if the received response from the server is ERR_LFULL, 
+	#parsing connect_data will NOT result to exception
+	
+	#if the received response from server is ERR_LDNE, 
+	#parsing connect_data will result to an exception hence going inside except block
+		
+	
 	return connectPacket
 
 #############################################################################################
@@ -149,9 +151,23 @@ def btn_ok(event=None):
 			lobby_id = connectPacket.lobby_id
 
 		else:
-			lobby_id = simpledialog.askstring("Lobby ID", "Enter lobby ID", parent=name_Frm)
-			connectPacket =  ConnectPlayerToServer(player, packet, lobby_id)
-		
+			connectPacket = packet.ConnectPacket()
+			connectPacket.type = 5
+			L = Label()
+			while connectPacket.type==5 or connectPacket.type==6: 
+
+				lobby_id = simpledialog.askstring("Lobby ID", "Enter lobby ID", parent=name_Frm)
+				connectPacket =  ConnectPlayerToServer(player, connectPacket, lobby_id)
+				L.destroy()
+				if connectPacket.type==5:
+					L = Label(name_Frm, text="Lobby does not exist!", bg="BLACK", fg="RED")
+					L.grid(column=0, row=3, columnspan=2)
+				if connectPacket.type==6:
+					L = Label(name_Frm, text="Lobby full!", bg="BLACK", fg="RED")
+					L.grid(column=0, row=3, columnspan=2)
+
+			print('Received from server: ' + str(connectPacket))  # show in terminal
+			print(connectPacket.player.name + " has entered the game")		
 
 		game_map(chosen_map, player, packet, lobby_id, connectPacket)
 		name_Frm.pack_forget()
