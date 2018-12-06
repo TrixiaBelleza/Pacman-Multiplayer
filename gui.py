@@ -388,7 +388,7 @@ def chat_process(player, packet, lobby_id, connectPacket):
 
 			
 			
-		if chatPacket.message.strip() == "bye":
+		if chatPacket.message.strip() == "bye" and chatPacket.player.name == player.name:
 			disconnectPacket.type = TcpPacket.DISCONNECT
 			disconnectPacket.player.name = player.name
 			socket.send(disconnectPacket.SerializeToString())
