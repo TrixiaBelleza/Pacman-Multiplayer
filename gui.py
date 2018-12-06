@@ -238,6 +238,7 @@ def game_map(chosen_map, player, packet, lobby_id, connectPacket):
 	entry_Frm = Frame(window, bg="BLACK", height=50, width=400)
 	chat_entry(player, packet, lobby_id, connectPacket)
 
+
 	optionsFrm.pack()
 	map_Frame.pack()
 	chat_history_Frm.pack()
@@ -355,6 +356,7 @@ def chat_entry(player, packet, lobby_id, connectPacket):
 	enter_chat_btn.grid(column=1, row=0)
 
 def get_chat_entry(player, packet, lobby_id, connectPacket, event=None):
+	global chatPacket
 	# maintains a list of possible input streams 
 	sockets_list = [sys.stdin, socket] 
 	#Instantiate chat packet 
@@ -387,27 +389,16 @@ def get_chat_entry(player, packet, lobby_id, connectPacket, event=None):
 				print(connectPacket.player.name + " has entered the game")
 			#Chat packet type
 			if packet_type == 3:
-				
-				chat_history_Txt.config(state=NORMAL)
-				chat_history_Txt.insert(END, chatPacket.message + '\n')
-				chat_history_Txt.see("end")
-				chat_history_Txt.config(state=DISABLED)
-				#Receive broadcasted data from server
+
 				chatPacket.ParseFromString(packet_received)
 				print(chatPacket.player.name+": "+ chatPacket.message) 
-				
-				chat_entry.delete(0,len(chat_entry.get()))
+
 		else: 
 			# #Write your message here
 			chatPacket.type = TcpPacket.CHAT
 			chatPacket.message = chat_entry.get()
 			chatPacket.player.name = player.name
 			chatPacket.lobby_id = lobby_id
-			
-			chat_history_Txt.config(state=NORMAL)
-			chat_history_Txt.insert(END, chatPacket.message + '\n')
-			chat_history_Txt.see("end")
-			chat_history_Txt.config(state=DISABLED)
 
 			socket.send(chatPacket.SerializeToString())
 
@@ -424,8 +415,13 @@ def get_chat_entry(player, packet, lobby_id, connectPacket, event=None):
 				disconnectPacket.player.name = player.name
 				socket.send(disconnectPacket.SerializeToString())
 
-			chat_entry.delete(0,len(chat_entry.get()))
 
+		chat_history_Txt.config(state=NORMAL)
+		chat_history_Txt.insert(END, chatPacket.message + '\n')
+		chat_history_Txt.see("end")
+		chat_history_Txt.config(state=DISABLED)
+
+		chat_entry.delete(0,len(chat_entry.get()))
 	return chat_entry.get()
 
 # BACK TO MAIN MENU PROMPT
