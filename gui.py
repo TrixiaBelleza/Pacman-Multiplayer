@@ -85,11 +85,7 @@ def ConnectPlayerToServer(player, connectPacket, lobby_id):
 		connectPacket.ParseFromString(connect_data)
 	except:
 		return connectPacket	
-		#if connectPacket.type == TcpPacket.ERR_LDNE:
-		#	print("Lobby does not exist!\n")
 		
-	#if connectPacket.type == TcpPacket.ERR_LFULL:
-		#print("Lobby is full!\n")
 	#if the received response from the server is ERR_LFULL, 
 	#parsing connect_data will NOT result to exception
 	
@@ -120,10 +116,10 @@ def main():
 	return window
 
 def show_About():
-	messagebox.showinfo("ABOUT", "This game is brought to you by:\nTrixia, Jesi, Mark, and Kianne")
+	messagebox.showinfo("ABOUT", "This game is brought to you by:\n\n Trixia Belleza\n Jesi Musngi\n Mark Mataya\n Kianne Luna\n\nAll rights reserved.2018")
 
-def show_Instructions():
-	messagebox.showinfo("INSTRUCTIONS", "To play the game, ...")
+def show_Mechanics():
+	messagebox.showinfo("MECHANICS", "  At the start of the game, all pacmen are placed at the corners of the map. The pacmen can move using the up, down, left, and right arrow keys. The pacmen will run through the maze to eat pac-dots and pac-stars. One pac-star will appear every 15 seconds after one pac-star has been eaten. If a pacman gets to eat a pac-star, he will be given a temporary ability to eat the other pacmen. The amount of time a pacman can have this ability is only 5 seconds. The pacman that has been eaten will be revived at the middle of the map. However, he will not be able to move for the first 3 seconds upon revival. When the game is over, the pacman that has the most number of pac-points wins. Players can chat during the game.")
 
 def exit_Game():
 	prompt = messagebox.askyesno("EXIT", "Are you sure you want to exit? No data will be saved.")
@@ -167,7 +163,7 @@ def btn_ok(event=None):
 					L.grid(column=0, row=3, columnspan=2)
 
 			print('Received from server: ' + str(connectPacket))  # show in terminal
-			print(connectPacket.player.name + " has entered the game")		
+			print(connectPacket.player.name + " has entered the chat room.")		
 
 		game_map(chosen_map, player, packet, lobby_id, connectPacket)
 		name_Frm.pack_forget()
@@ -245,7 +241,7 @@ def game_map(chosen_map, player, packet, lobby_id, connectPacket):
 	map_name_lbl.grid(column=0, row=0, padx=40)	
 	
 	global Back_btn
-	Back_btn = Button(optionsFrm, text="Exit Game",bg="sky blue", padx=15, pady=0, command=back)
+	Back_btn = Button(optionsFrm, text="Exit Game",bg="sky blue", padx=15, pady=0, command=exit)
 	Back_btn.grid(column=1, row=0, padx=40)	
 		
 	# CHAT HISTORY FRAME ------------------------------------------------------
@@ -260,9 +256,11 @@ def game_map(chosen_map, player, packet, lobby_id, connectPacket):
 	optionsFrm.pack()
 	map_Frame.pack()
 	chat_history_Frm.pack()
-	entry_Frm.pack()
+	entry_Frm.pack()	
 	map_template.close()
 
+	# L = Label(tk_window, text="INSTRUCTIONS", bg="BLACK", fg="WHITE")
+	# L.grid(column=0, row=5, columnspan=2)
 
 # GAME FUNCTIONS ====================================================================================================
 
@@ -363,7 +361,6 @@ def entry_callback(event):
     print("entry")
     process(event.widget.get())
 def chat_process(player, packet, lobby_id, connectPacket):
-		
 	sockets_list = [sys.stdin, socket] 
 	#Instantiate chat packet 
 	chatPacket = packet.ChatPacket()
@@ -383,24 +380,25 @@ def chat_process(player, packet, lobby_id, connectPacket):
 			if disconnectPacket.player.name == "":
 				#if the disconnection is normal
 				if disconnectPacket.update == 0:
-					print("You left the game.")
+					print("You left the chat room.")
 				else:
-					print("Unknown error occured.\nYou have been disconnected from the game")
+					print("Unknown error occured.\nYou have been disconnected from the chat room.")
+				socket.close()
 				sys.exit()
 			else :
-				print(disconnectPacket.player.name + " has left the game.")
+				print(disconnectPacket.player.name + " has left the chat room.")
 				chat_history_Txt.config(state=NORMAL)
-				chat_history_Txt.insert(END, disconnectPacket.player.name + " has left the game." + '\n')
+				chat_history_Txt.insert(END, disconnectPacket.player.name + " has left the chat room." + '\n')
 				chat_history_Txt.see("end")
 				chat_history_Txt.config(state=DISABLED)
 
 		#Connect packet type
 		if packet_type == 1:
 			connectPacket.ParseFromString(packet_received)
-			print(connectPacket.player.name + " has entered the game" + '\n')
+			print(connectPacket.player.name + " has entered the chat room." + '\n')
 
 			chat_history_Txt.config(state=NORMAL)
-			chat_history_Txt.insert(END, connectPacket.player.name + " has entered the game" + '\n')
+			chat_history_Txt.insert(END, connectPacket.player.name + " has entered the chat room." + '\n')
 			chat_history_Txt.see("end")
 			chat_history_Txt.config(state=DISABLED)
 		#Chat packet type
@@ -427,7 +425,7 @@ def chat_process(player, packet, lobby_id, connectPacket):
 
 def chat_entry(player, packet, lobby_id, connectPacket):
 	global chat_entry
-	chat_entry = Entry(entry_Frm, width=47)
+	chat_entry = Entry(entry_Frm, width=42)
 	chat_entry.focus_set()
 	chat_entry.bind("<Return>", lambda x: get_chat_entry(player,packet,lobby_id, connectPacket))
 	
@@ -439,7 +437,7 @@ def chat_entry(player, packet, lobby_id, connectPacket):
 	chat_process(player, packet, lobby_id, connectPacket)
 
 	chat_history_Txt.config(state=NORMAL)
-	chat_history_Txt.insert(END, "You entered the game" + '\n')
+	chat_history_Txt.insert(END, "You entered the chat room." + '\n')
 	chat_history_Txt.see("end")
 	chat_history_Txt.config(state=DISABLED)
 	
@@ -488,7 +486,7 @@ game_map3btn.grid(column=2, row=2, padx=1, pady=10, ipadx=9, ipady=10)
 
 about_btn = Button(main_frame, text="About", command=show_About)
 about_btn.grid(column=0, row=3, padx=10, ipadx=5, pady=25, ipady=6, sticky=SE)
-how_btn = Button(main_frame, text="Instructions", command=show_Instructions)
+how_btn = Button(main_frame, text="Mechanics", command=show_Mechanics)
 how_btn.grid(column=1, row=3, padx=10, ipadx=5, pady=25, ipady=6, sticky=SE)
 exit_btn = Button(main_frame, text="Exit", command=exit_Game)
 exit_btn.grid(column=2, row=3, padx=10, ipadx=10, pady=25, ipady=6, sticky=SE)
