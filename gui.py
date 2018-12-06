@@ -371,10 +371,20 @@ def chat_process(player, packet, lobby_id, connectPacket):
 				sys.exit()
 			else :
 				print(disconnectPacket.player.name + " has left the game.")
+				chat_history_Txt.config(state=NORMAL)
+				chat_history_Txt.insert(END, disconnectPacket.player.name + " has left the game." + '\n')
+				chat_history_Txt.see("end")
+				chat_history_Txt.config(state=DISABLED)
+
 		#Connect packet type
 		if packet_type == 1:
 			connectPacket.ParseFromString(packet_received)
-			print(connectPacket.player.name + " has entered the game")
+			print(connectPacket.player.name + " has entered the game" + '\n')
+
+			chat_history_Txt.config(state=NORMAL)
+			chat_history_Txt.insert(END, connectPacket.player.name + " has entered the game" + '\n')
+			chat_history_Txt.see("end")
+			chat_history_Txt.config(state=DISABLED)
 		#Chat packet type
 		if packet_type == 3:
 			#Receive broadcasted data from server
@@ -386,7 +396,6 @@ def chat_process(player, packet, lobby_id, connectPacket):
 			chat_history_Txt.see("end")
 			chat_history_Txt.config(state=DISABLED)
 
-			
 			
 		if chatPacket.message.strip() == "bye" and chatPacket.player.name == player.name:
 			disconnectPacket.type = TcpPacket.DISCONNECT
