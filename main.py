@@ -1,9 +1,17 @@
 #main.py
 
+<<<<<<< HEAD
+import backend_chat_module
+import gui
+# import 137_gui;
+
+
+=======
 # import backend_chat_module
 import gui
 # import 137_gui;
 
+>>>>>>> ced8a96107c626e978a6abfc44b6c04b213c84f8
 window = main()
 window.resizable(width=FALSE, height=FALSE)
 main_frame = Frame(window, bg="BLACK", padx=50, pady=50)
