@@ -102,7 +102,7 @@ def pacman_window():
 	tk_window = tkinter.Tk()
 	tk_window.title("BATTLE OF THE PACMEN")
 	w = 500 # height for tk_window
-	h = 650 # height for tk_window
+	h = 700 # height for tk_window
 	x = (tk_window.winfo_screenwidth()/2) - (w/2) # calculate x and y coordinates for tk_window
 	y = (tk_window.winfo_screenheight()/2) - (h/2)
 	# set the dimensions of the screen and where it is placed
@@ -259,8 +259,17 @@ def game_map(chosen_map, player, packet, lobby_id, connectPacket):
 	entry_Frm.pack()	
 	map_template.close()
 
-	# L = Label(tk_window, text="INSTRUCTIONS", bg="BLACK", fg="WHITE")
-	# L.grid(column=0, row=5, columnspan=2)
+	inst_Frm = LabelFrame(window,text = "INSTRUCTIONS", bg = "BLACK", fg = "WHITE")
+	inst_Frm.pack(fill = "both")
+
+	up_Arrow = Label(inst_Frm, text = "Up Arrow Key - Go Up", bg = "BLACK", fg = "WHITE")
+	up_Arrow.pack()
+	down_Arrow = Label(inst_Frm, text = "Down Arrow Key - Go Down", bg = "BLACK", fg = "WHITE")
+	down_Arrow.pack()
+	right_Arrow = Label(inst_Frm, text = "Right Arrow Key - Go Right", bg = "BLACK", fg = "WHITE")
+	right_Arrow.pack()
+	left_Arrow = Label(inst_Frm, text = "Left Arrow Key - Go Left", bg = "BLACK", fg = "WHITE")
+	left_Arrow.pack()
 
 # GAME FUNCTIONS ====================================================================================================
 
