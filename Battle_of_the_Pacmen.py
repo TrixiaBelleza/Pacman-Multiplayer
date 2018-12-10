@@ -4,9 +4,10 @@ from tkinter import *
 from tkinter import messagebox, simpledialog
 from tcp_packet_pb2 import TcpPacket
 from player_pb2 import Player
+from Banner.banner import Banner
 import select
 import socket
-# MAIN WINDOW FUNCTIONS =============================================================================================
+
 # global socket
 server_address = ('202.92.144.45', 80) 	#address = (hostname, port)
 socket = socket.socket()  # instantiate socket
@@ -101,7 +102,7 @@ def ConnectPlayerToServer(player, connectPacket, lobby_id):
 def pacman_window():
 	tk_window = tkinter.Tk()
 	tk_window.title("BATTLE OF THE PACMEN")
-	w = 500 # height for tk_window
+	w = 700 # height for tk_window
 	h = 700 # height for tk_window
 	x = (tk_window.winfo_screenwidth()/2) - (w/2) # calculate x and y coordinates for tk_window
 	y = (tk_window.winfo_screenheight()/2) - (h/2)
@@ -112,7 +113,6 @@ def pacman_window():
 
 def main():
 	window = pacman_window()
-	#main_chat()
 	return window
 
 def show_About():
@@ -126,7 +126,7 @@ def exit_Game():
 	if prompt == True:
 		window.destroy()
 
-# GETS PLAYER'chat_scrollbar NAME ================================================================================================
+# GETS PLAYER'S NAME ================================================================================================
 def getPlayerType():
 	player_type = messagebox.askquestion("USER TYPE", "Are you the host?\nPress YES if you are the host. NO if you're just a player.")
 	if player_type == "yes":
@@ -137,15 +137,16 @@ def getPlayerType():
 
 def btn_ok(event=None):
 	if name_Entry.get().isalnum():
-		#instantiate player
-		player =  InstantiatePlayer(name_Entry.get())
-		#instantiate packet
-		packet = TcpPacket()
+		player =  InstantiatePlayer(name_Entry.get()) 		# instantiate player
+		packet = TcpPacket() 		# instantiate packet
+
+		# HOST ==========================================
 		if getPlayerType() == "h":
 			max_players = simpledialog.askinteger("Max Players", "Enter max number of players", parent=name_Frm)
 			connectPacket =  ConnectHostToServer(player,packet,max_players)
 			lobby_id = connectPacket.lobby_id
 
+		# NOT HOST ========================================
 		else:
 			connectPacket = packet.ConnectPacket()
 			connectPacket.type = 5
@@ -155,9 +156,13 @@ def btn_ok(event=None):
 				lobby_id = simpledialog.askstring("Lobby ID", "Enter lobby ID", parent=name_Frm)
 				connectPacket =  ConnectPlayerToServer(player, connectPacket, lobby_id)
 				L.destroy()
+
+				# Lobby does not exist
 				if connectPacket.type==5:
 					L = Label(name_Frm, text="Lobby does not exist!", bg="BLACK", fg="RED")
 					L.grid(column=0, row=3, columnspan=2)
+
+				# Lobby full
 				if connectPacket.type==6:
 					L = Label(name_Frm, text="Lobby full!", bg="BLACK", fg="RED")
 					L.grid(column=0, row=3, columnspan=2)
@@ -165,7 +170,7 @@ def btn_ok(event=None):
 			print('Received from server: ' + str(connectPacket))  # show in terminal
 			print(connectPacket.player.name + " has entered the chat room.")		
 
-		game_map(chosen_map, player, packet, lobby_id, connectPacket)
+		game_map(chosen_map, player, packet, lobby_id, connectPacket) 	# show game
 		name_Frm.pack_forget()
 	else:
 		L = Label(name_Frm, text="Invalid name. Must consist of \nletters and numbers only.", bg="BLACK", fg="RED")
@@ -175,6 +180,7 @@ def btn_cancel():
 	name_Frm.pack_forget()
 	main_frame.pack()
 
+# Name of chosen map
 def get_name(map_selected):
 	global chosen_map
 	chosen_map = map_selected
@@ -184,6 +190,7 @@ def get_name(map_selected):
 	global name_Frm
 	name_Frm = Frame(window, bg="BLACK", pady=100)
 
+	# Ask for player's name
 	L = Label(name_Frm, text="Please enter your name", bg="BLACK", fg="WHITE", pady=20)
 	L.grid(column=0, row=0, columnspan=2)
 	global name_Entry
@@ -231,6 +238,7 @@ def game_map(chosen_map, player, packet, lobby_id, connectPacket):
 		map_matrix.append(line)	
 
 	main_frame.pack_forget()
+	title_frame.pack_forget()
 	create_Map()
 
 	# MENU BOX FRAME ----------------------------------------------------------
@@ -246,21 +254,25 @@ def game_map(chosen_map, player, packet, lobby_id, connectPacket):
 		
 	# CHAT HISTORY FRAME ------------------------------------------------------
 	global chat_history_Frm
-	chat_history_Frm = Frame(window, bg="WHITE", height=50, width=400)
+	chat_history_Frm = Frame(window, bg="WHITE", height=50)
 	chat_history()
 
 	# CHAT ENTRY FRAME --------------------------------------------------------
 	global entry_Frm
-	entry_Frm = Frame(window, bg="BLACK", height=50, width=400)
+	entry_Frm = Frame(window, bg="BLACK", height=50)
 	chat_entry(player, packet, lobby_id, connectPacket)
 	optionsFrm.pack()
 	map_Frame.pack()
-	chat_history_Frm.pack()
-	entry_Frm.pack()	
+	chat_history_Frm.pack(fill=X)
+	entry_Frm.pack(fill=X)	
 	map_template.close()
 
+	separator = Frame(height=2, bd=1, relief=SUNKEN)
+	separator.pack(fill=X, padx=8, pady=8)
+
+	# INSTRUCTIONS LABEL FRAME -------------------------------------------------
 	inst_Frm = LabelFrame(window,text = "INSTRUCTIONS", bg = "BLACK", fg = "WHITE")
-	inst_Frm.pack(fill = "both")
+	inst_Frm.pack(fill=X)
 
 	up_Arrow = Label(inst_Frm, text = "Up Arrow Key - Go Up", bg = "BLACK", fg = "WHITE")
 	up_Arrow.pack()
@@ -356,9 +368,9 @@ def key_listeners(event):
 def chat_history():
 	global chat_history_Txt
 	chat_scrollbar = Scrollbar(chat_history_Frm)
-	chat_history_Txt = Text(chat_history_Frm, height=5, width=60)
+	chat_history_Txt = Text(chat_history_Frm, height=5)
 	chat_scrollbar.pack(side=RIGHT, fill=Y)
-	chat_history_Txt.pack(side=LEFT, fill=Y)
+	chat_history_Txt.pack(side=LEFT, fill=X)
 	chat_scrollbar.config(command=chat_history_Txt.yview)
 	chat_history_Txt.config(yscrollcommand=chat_scrollbar.set)
 	chat_history_Txt.config(state=DISABLED)
@@ -369,14 +381,14 @@ def process(data):
 def entry_callback(event):
     print("entry")
     process(event.widget.get())
+
 def chat_process(player, packet, lobby_id, connectPacket):
 	sockets_list = [sys.stdin, socket] 
-	#Instantiate chat packet 
-	chatPacket = packet.ChatPacket()
-	#Instantiate disconnect packet
-	disconnectPacket = packet.DisconnectPacket()
-
+	chatPacket = packet.ChatPacket() 	# Instantiate chat packet 
+	disconnectPacket = packet.DisconnectPacket() 	# Instantiate disconnect packet
 	disconnectPacket.type = TcpPacket.DISCONNECT
+
+	# ON-GOING CHAT -----------------------------------------------------------
 	read_sockets,write_socket,error_socket = select.select(sockets_list,[],[],0)
 	for socks in read_sockets: 
 
@@ -387,21 +399,21 @@ def chat_process(player, packet, lobby_id, connectPacket):
 		if packet_type == 0:
 			disconnectPacket.ParseFromString(packet_received)
 			if disconnectPacket.player.name == "":
-				#if the disconnection is normal
-				if disconnectPacket.update == 0:
+				if disconnectPacket.update == 0: 		# if the disconnection is normal
 					print("You left the chat room.")
 				else:
 					print("Unknown error occured.\nYou have been disconnected from the chat room.")
 				socket.close()
 				sys.exit()
 			else :
+				# broadcast disconnected player
 				print(disconnectPacket.player.name + " has left the chat room.")
 				chat_history_Txt.config(state=NORMAL)
 				chat_history_Txt.insert(END, disconnectPacket.player.name + " has left the chat room." + '\n')
 				chat_history_Txt.see("end")
 				chat_history_Txt.config(state=DISABLED)
 
-		#Connect packet type
+		# Connect packet type
 		if packet_type == 1:
 			connectPacket.ParseFromString(packet_received)
 			print(connectPacket.player.name + " has entered the chat room." + '\n')
@@ -410,9 +422,11 @@ def chat_process(player, packet, lobby_id, connectPacket):
 			chat_history_Txt.insert(END, connectPacket.player.name + " has entered the chat room." + '\n')
 			chat_history_Txt.see("end")
 			chat_history_Txt.config(state=DISABLED)
-		#Chat packet type
+
+		# Chat packet type
 		if packet_type == 3:
-			#Receive broadcasted data from server
+
+			# Receive broadcasted data from server
 			chatPacket.ParseFromString(packet_received)
 			print(chatPacket.player.name+": "+ chatPacket.message) 
 
@@ -420,8 +434,8 @@ def chat_process(player, packet, lobby_id, connectPacket):
 			chat_history_Txt.insert(END, chatPacket.player.name+ ':' + chatPacket.message + '\n')
 			chat_history_Txt.see("end")
 			chat_history_Txt.config(state=DISABLED)
-
 			
+		# Exit Chat
 		if chatPacket.message.strip() == "bye" and chatPacket.player.name == player.name:
 			disconnectPacket.type = TcpPacket.DISCONNECT
 			disconnectPacket.player.name = player.name
@@ -434,7 +448,7 @@ def chat_process(player, packet, lobby_id, connectPacket):
 
 def chat_entry(player, packet, lobby_id, connectPacket):
 	global chat_entry
-	chat_entry = Entry(entry_Frm, width=42)
+	chat_entry = Entry(entry_Frm, width=67)
 	chat_entry.focus_set()
 	chat_entry.bind("<Return>", lambda x: get_chat_entry(player,packet,lobby_id, connectPacket))
 	
@@ -464,7 +478,7 @@ def get_chat_entry(player, packet, lobby_id, connectPacket, event=None):
 
 	return chat_entry.get()
 
-# BACK TO MAIN MENU PROMPT
+# BACK TO MAIN MENU PROMPT ==========================================================================================
 def back():
 	prompt = messagebox.askyesno("ARE YOU SURE YOU WANT TO EXIT?", "Once you leave, your game will be lost.")
 	if prompt == True:
@@ -478,9 +492,15 @@ def back():
 
 window = main()
 window.resizable(width=FALSE, height=FALSE)
+title_frame = Frame(window, bg="BLACK", padx=30, pady=30)
+title_frame.pack_propagate(True)
+title_frame.pack()
+
 main_frame = Frame(window, bg="BLACK", padx=50, pady=50)
 main_frame.pack_propagate(False)
 main_frame.pack()
+
+title = Banner(title_frame)
 
 # MAIN WINDOW WIDGETS ===============================================================================================
 
