@@ -6,6 +6,9 @@ from tcp_packet_pb2 import TcpPacket
 from player_pb2 import Player
 from Banner.banner import Banner
 from sprites.Pacman.yellow import Yellow
+from sprites.Pacman.blue import Blue
+from sprites.Pacman.purple import Purple
+from sprites.Pacman.green import Green
 import select
 import socket
 
@@ -117,7 +120,8 @@ def main():
 	return window
 
 def show_About():
-	messagebox.showinfo("ABOUT", "This game is brought to you by:\n\n Trixia Belleza\n Jesi Musngi\n Mark Mataya\n Kianne Luna\n\nAll rights reserved.2018")
+	msg = "This game is brought to you by:\n\n Trixia Belleza\n Jesi Musngi\n Mark Mataya\n Kianne Luna\n\nAll rights reserved.2018"
+	messagebox.showinfo("ABOUT", msg)
 
 def show_Mechanics():
 	messagebox.showinfo("MECHANICS", "  At the start of the game, all pacmen are placed at the corners of the map. The pacmen can move using the up, down, left, and right arrow keys. The pacmen will run through the maze to eat pac-dots and pac-stars. One pac-star will appear every 15 seconds after one pac-star has been eaten. If a pacman gets to eat a pac-star, he will be given a temporary ability to eat the other pacmen. The amount of time a pacman can have this ability is only 5 seconds. The pacman that has been eaten will be revived at the middle of the map. However, he will not be able to move for the first 3 seconds upon revival. When the game is over, the pacman that has the most number of pac-points wins. Players can chat during the game.")
@@ -514,11 +518,13 @@ game_map2btn.grid(column=1, row=2, padx=1, pady=10, ipadx=9, ipady=10)
 game_map3btn.grid(column=2, row=2, padx=1, pady=10, ipadx=9, ipady=10)
 
 about_btn = Button(main_frame, text="About", command=show_About)
-about_btn.grid(column=0, row=3, padx=10, ipadx=5, pady=25, ipady=6, sticky=SE)
+about_btn.grid(column=0, row=3, padx=10, ipadx=5, pady=25, ipady=6)
+
 how_btn = Button(main_frame, text="Mechanics", command=show_Mechanics)
-how_btn.grid(column=1, row=3, padx=10, ipadx=5, pady=25, ipady=6, sticky=SE)
+how_btn.grid(column=1, row=3, padx=10, ipadx=5, pady=25, ipady=6)
+
 exit_btn = Button(main_frame, text="Exit", command=exit_Game)
-exit_btn.grid(column=2, row=3, padx=10, ipadx=10, pady=25, ipady=6, sticky=SE)
+exit_btn.grid(column=2, row=3, padx=10, ipadx=10, pady=25, ipady=6)
 
 #====================================================================================================================
 
