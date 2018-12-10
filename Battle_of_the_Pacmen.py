@@ -5,6 +5,7 @@ from tkinter import messagebox, simpledialog
 from tcp_packet_pb2 import TcpPacket
 from player_pb2 import Player
 from Banner.banner import Banner
+from sprites.Pacman.yellow import Yellow
 import select
 import socket
 
@@ -325,7 +326,7 @@ def create_Map():
 			elif map_matrix[row][col] == "e":	# EMPTY FLOOR
 				block = canvas.create_rectangle(x_pos, y_pos, x_pos+increment, y_pos+increment, fill="BLACK", outline="")
 			elif map_matrix[row][col] == "P":	# PLAYER
-				block = canvas.create_rectangle(x_pos, y_pos, x_pos+increment, y_pos+increment, fill="RED", outline="")
+				block = Yellow(map_Frame,canvas,x_pos+increment-8,y_pos+increment-8,"Right")
 			x_pos += increment
 		y_pos += increment
 	
@@ -342,26 +343,25 @@ def key_listeners(event):
 			map_matrix[player_xpos][player_ypos] = "e"
 			map_matrix[player_xpos][player_ypos-1] = "P"
 			block = canvas.create_rectangle(player_ypos*20, player_xpos*20, player_ypos*20+20, player_xpos*20+20, fill="BLACK", outline="")
-			block = canvas.create_rectangle((player_ypos-1)*20, player_xpos*20, (player_ypos-1)*20+20, player_xpos*20+20, fill="RED", outline="")
+			block = Yellow(map_Frame,canvas,(player_ypos-1)*20+10,player_xpos*20+12,event.keysym)
 	elif event.keysym == "Right":
 		if map_matrix[player_xpos][player_ypos+1] == "D" or map_matrix[player_xpos][player_ypos+1] == "s" or map_matrix[player_xpos][player_ypos+1] == "e":
 			map_matrix[player_xpos][player_ypos] = "e"
 			map_matrix[player_xpos][player_ypos+1] = "P"
 			block = canvas.create_rectangle(player_ypos*20, player_xpos*20, player_ypos*20+20, player_xpos*20+20, fill="BLACK", outline="")
-			block = canvas.create_rectangle((player_ypos+1)*20, player_xpos*20, (player_ypos+1)*20+20, player_xpos*20+20, fill="RED", outline="")
+			block = Yellow(map_Frame,canvas,(player_ypos+1)*20+12,player_xpos*20+12,event.keysym)
 	elif event.keysym == "Up":
 		if map_matrix[player_xpos-1][player_ypos] == "D" or map_matrix[player_xpos-1][player_ypos] == "s" or map_matrix[player_xpos-1][player_ypos] == "e":
 			map_matrix[player_xpos][player_ypos] = "e"
 			map_matrix[player_xpos-1][player_ypos] = "P"
 			block = canvas.create_rectangle(player_ypos*20, player_xpos*20, player_ypos*20+20, player_xpos*20+20, fill="BLACK", outline="")
-			block = canvas.create_rectangle(player_ypos*20, (player_xpos-1)*20, player_ypos*20+20, (player_xpos-1)*20+20, fill="RED", outline="")
+			block = Yellow(map_Frame,canvas,player_ypos*20+12,(player_xpos-1)*20+10,event.keysym)
 	elif event.keysym == "Down":
 		if map_matrix[player_xpos+1][player_ypos] == "D" or map_matrix[player_xpos+1][player_ypos] == "s" or map_matrix[player_xpos+1][player_ypos] == "e":
 			map_matrix[player_xpos][player_ypos] = "e"
 			map_matrix[player_xpos+1][player_ypos] = "P"
 			block = canvas.create_rectangle(player_ypos*20, player_xpos*20, player_ypos*20+20, player_xpos*20+20, fill="BLACK", outline="")
-			block = canvas.create_rectangle(player_ypos*20, (player_xpos+1)*20, player_ypos*20+20, (player_xpos+1)*20+20, fill="RED", outline="")
-
+			block = Yellow(map_Frame,canvas,player_ypos*20+10,(player_xpos+1)*20+12,event.keysym)
 
 # CHAT FUNCTIONALITIES ==============================================================================================
 
