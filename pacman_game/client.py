@@ -70,6 +70,13 @@ class Client():
 		movementPacket.player = self.player
 		self.socket.sendto(pickle.dumps(movementPacket), self.server_address)
 
+		#Receive player count from server
+		data, addr = self.socket.recvfrom(self.BUFFER_SIZE)
+		loaded_data = pickle.loads(data)
+
+		self.map_matrix = loaded_data.map_matrix
+		self.render_board()
+
 	def render_board(self):
 
 		def pacman_window():

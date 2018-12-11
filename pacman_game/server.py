@@ -66,6 +66,11 @@ class Server():
 			if packet_type == "MOVE":
 				movement = loaded_data.movement 
 				player = loaded_data.player
-				print(player.name)
 				self.game_map.move(player,movement)
+
+				#Send gamemap
+				sendGameMapPacket =  UDPpacket.UDPpacket("SEND_GAMEMAP") 
+				sendGameMapPacket.map_matrix = self.game_map.map_matrix
+				self.socket.sendto(pickle.dumps(sendGameMapPacket), addr)
+
 
