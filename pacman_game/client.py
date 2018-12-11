@@ -64,6 +64,12 @@ class Client():
 
 		return(loaded_data.player_count)
 
+	def move(self, movement): 
+		movementPacket = UDPpacket.UDPpacket("MOVE")
+		movementPacket.movement = movement
+		movementPacket.player = self.player
+		self.socket.sendto(pickle.dumps(movementPacket), self.server_address)
+
 	def render_board(self):
 
 		def pacman_window():
@@ -90,6 +96,7 @@ class Client():
 		
 		def key_listeners(event):
 			print(event.keysym)
+			self.move(event.keysym)
 
 		def create_Map():
 			block_height = 20 * len(self.map_matrix)
@@ -148,3 +155,4 @@ class Client():
 
 		self.map_matrix = loaded_data.map_matrix
 		self.render_board()
+

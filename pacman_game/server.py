@@ -11,7 +11,7 @@ class Server():
 	hostname = ''
 	port = ''
 	room = ''
-
+	game_map = ''
 	def __init__(self, hostname, port):
 		self.hostname = hostname
 		self.port = port
@@ -56,9 +56,16 @@ class Server():
 				self.socket.sendto(pickle.dumps(sendRoomPacket), addr)
 
 			if packet_type == "START_GAME":
-				game_map = pacman.GameMap("map1.txt")
+				self.game_map = pacman.GameMap("map1.txt", self.room.clients)
 
 				#Send gamemap
 				sendGameMapPacket =  UDPpacket.UDPpacket("SEND_GAMEMAP") 
-				sendGameMapPacket.map_matrix = game_map.map_matrix
+				sendGameMapPacket.map_matrix = self.game_map.map_matrix
 				self.socket.sendto(pickle.dumps(sendGameMapPacket), addr)
+
+			if packet_type == "MOVE":
+				movement = loaded_data.movement 
+				player = loaded_data.player
+				print(player.name)
+				self.game_map.move(player,movement)
+

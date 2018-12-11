@@ -16,31 +16,39 @@ class Room():
 		self.player_counter = 0
 
 	def add_client(self, new_player):
-		self.clients.append(new_player)
 		self.player_counter += 1
 
 		if self.player_counter == 1:
-			self.current_pos = (1,1)
+			new_player.current_pos = (1,1)
 		elif self.player_counter == 2:
-			self.current_pos = (9,9)
+			new_player.current_pos = (9,9)
 		elif self.player_counter == 3:
-			self.current_pos = (9,1)
+			new_player.current_pos = (9,1)
 		elif self.player_counter == 4:
-			self.current_pos = (1,9)
+			new_player.current_pos = (1,9)
+
+		self.clients.append(new_player)
+
 
 class GameMap():
 
-	def __init__(self, map_name):
+	def __init__(self, map_name, clients):
 		self.map_name = map_name
 		self.map_matrix = []
+		self.clients = clients
 		
 		with open(map_name, "r") as map_file:
 			for lines in map_file:
 				line = []
 				line[0:len(lines)] = iter(lines)
 				self.map_matrix.append(line)
-				
+
+		for client in clients :
+			row, col = client.current_pos
+			self.map_matrix[row][col] = "P"
 		# print(self.map_matrix)
 
-		def move(self, player, movement):
-			print(movement)
+	def move(self, player, movement):
+		print(movement)
+		# row, col = client.current_pos
+		# self.map_matrix[row][col] = "P"
