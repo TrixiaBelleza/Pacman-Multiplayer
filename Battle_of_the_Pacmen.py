@@ -252,7 +252,8 @@ def game_map(chosen_map, player, packet, lobby_id, connectPacket):
 	global Back_btn
 	Back_btn = Button(optionsFrm, text="Exit Game",bg="sky blue", padx=15, pady=0, command=exit)
 	Back_btn.grid(column=2, row=0, padx=40)	
-		
+
+
 	# CHAT HISTORY FRAME ------------------------------------------------------
 	global chat_history_Frm
 	chat_history_Frm = Frame(window, bg="WHITE", height=50)
@@ -262,18 +263,18 @@ def game_map(chosen_map, player, packet, lobby_id, connectPacket):
 	global entry_Frm
 	entry_Frm = Frame(window, bg="BLACK", height=50)
 	chat_entry(player, packet, lobby_id, connectPacket)
+
+	# GAME UI
 	optionsFrm.pack()
 	map_Frame.pack()
-	chat_history_Frm.pack(fill=X)
-	entry_Frm.pack(fill=X)	
-	map_template.close()
 
-	separator = Frame(height=2, bd=1, relief=SUNKEN)
-	separator.pack(fill=X, padx=8, pady=8)
+	# INSTRUCTION AND SCOREBOARD -------------------------------------------------
+	grp_Frm = Frame(window, bg="BLACK")
+	grp_Frm.pack(fill=X)
 
 	# INSTRUCTIONS LABEL FRAME -------------------------------------------------
-	inst_Frm = LabelFrame(window,text = "INSTRUCTIONS", bg = "BLACK", fg = "WHITE")
-	inst_Frm.pack(fill=X)
+	inst_Frm = LabelFrame(grp_Frm,text = "INSTRUCTIONS", bg = "BLACK", fg = "WHITE", font="ARIAL")
+	inst_Frm.pack(side=LEFT, ipadx=50, padx=10)
 
 	up_Arrow = Label(inst_Frm, text = "Up Arrow Key - Go Up", bg = "BLACK", fg = "WHITE")
 	up_Arrow.pack()
@@ -283,6 +284,28 @@ def game_map(chosen_map, player, packet, lobby_id, connectPacket):
 	right_Arrow.pack()
 	left_Arrow = Label(inst_Frm, text = "Left Arrow Key - Go Left", bg = "BLACK", fg = "WHITE")
 	left_Arrow.pack()
+
+	# SCOREBOARD -------------------------------------------------------------
+	score_Frm = LabelFrame(grp_Frm,text = "SCOREBOARD", bg = "BLACK", fg = "RED", height=50, width=200, font="ARIAL")
+	score_Frm.pack(side=LEFT, ipadx=50)
+
+	x1 = Label(score_Frm, text = "Up Arrow Key - Go Up", bg = "BLACK", fg = "WHITE")
+	x1.pack()
+	x2 = Label(score_Frm, text = "Down Arrow Key - Go Down", bg = "BLACK", fg = "WHITE")
+	x2.pack()
+	x3 = Label(score_Frm, text = "Up Arrow Key - Go Up", bg = "BLACK", fg = "WHITE")
+	x3.pack()
+	x4 = Label(score_Frm, text = "Down Arrow Key - Go Down", bg = "BLACK", fg = "WHITE")
+	x4.pack()
+
+	separator = Frame(height=2, bd=1, relief=SUNKEN)
+	separator.pack(fill=X, padx=5, pady=5)
+
+	chat_history_Frm.pack(fill=X,anchor=S)
+	entry_Frm.pack(fill=X,anchor=S)	
+	map_template.close()
+
+
 
 # GAME FUNCTIONS ====================================================================================================
 
