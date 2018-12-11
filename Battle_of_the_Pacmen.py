@@ -51,7 +51,7 @@ def InstantiatePlayer(player_name):
 	player.name = player_name
 	return player
 
-#Connect host to server using connectPacket	
+# Connect host to server using connectPacket	
 def ConnectHostToServer(player, packet, max_players):
 	connectPacket = packet.ConnectPacket()
 
@@ -59,32 +59,25 @@ def ConnectHostToServer(player, packet, max_players):
 	lobby_id = CreateLobby(packet, max_players)
 	connectPacket.lobby_id = lobby_id
 	connectPacket.player.name = player.name
-	#Send connect packet to server
-	socket.send(connectPacket.SerializeToString()) 
+	socket.send(connectPacket.SerializeToString()) 	# Send connect packet to server
 
-	#Receive broadcasted data from server
+	# Receive broadcasted data from server
 	connect_data = bytearray(socket.recv(1024)) # receive response from server
 	connectPacket.ParseFromString(connect_data)
 
 	print('Received from server: ' + str(connectPacket))  # show in terminal
 	return connectPacket
 
-#Connect players (including host) to server using connectPacket	
+# Connect players (including host) to server using connectPacket	
 def ConnectPlayerToServer(player, connectPacket, lobby_id):
-	#connectPacket = packet.ConnectPacket()
-
-	#connectPacket.type = TcpPacket.ERR_LDNE
-	#assume first that the connectPacket type is error packet so that all can be put inside a try catch
-	#and loop until the lobby chosen is existing or is not full
 	
-	# lobby_id = input("Enter lobby id: ") 
 	connectPacket.type = TcpPacket.CONNECT
 	connectPacket.lobby_id = lobby_id
 	connectPacket.player.name = player.name
-	#Send connect packet to server
-	socket.send(connectPacket.SerializeToString()) 
-	#Receive broadcasted data from server
-	connect_data = bytearray(socket.recv(1024)) # receive response from server
+	socket.send(connectPacket.SerializeToString()) 		# Send connect packet to server
+	
+	# Receive broadcasted data from server
+	connect_data = bytearray(socket.recv(1024)) 	# Receive response from server
 	
 	try:
 		connectPacket.ParseFromString(connect_data)
@@ -120,11 +113,11 @@ def main():
 	return window
 
 def show_About():
-	msg = "This game is brought to you by:\n\n Trixia Belleza\n Jesi Musngi\n Mark Mataya\n Kianne Luna\n\nAll rights reserved.2018"
+	msg = "This is a Pacman-inspired multiplayer game brought to you by:\n\n Trixia Belleza\n Jesi Musngi\n Mark Mataya\n Kianne Luna\n\nCMSC 137 CD-4L | A.Y. 2018-2019\nAll rights reserved.2018"
 	messagebox.showinfo("ABOUT", msg)
 
 def show_Mechanics():
-	messagebox.showinfo("MECHANICS", "  At the start of the game, all pacmen are placed at the corners of the map. The pacmen can move using the up, down, left, and right arrow keys. The pacmen will run through the maze to eat pac-dots and pac-stars. One pac-star will appear every 15 seconds after one pac-star has been eaten. If a pacman gets to eat a pac-star, he will be given a temporary ability to eat the other pacmen. The amount of time a pacman can have this ability is only 5 seconds. The pacman that has been eaten will be revived at the middle of the map. However, he will not be able to move for the first 3 seconds upon revival. When the game is over, the pacman that has the most number of pac-points wins. Players can chat during the game.")
+	messagebox.showinfo("MECHANICS", "  At the start of the game, all pacmen are placed at the corners of the map. The pacmen can move using the up, down, left, and right arrow keys. The pacmen will run through the maze to eat pac-dots and pac-stars. One pac-star will appear every 15 seconds after one pac-star has been eaten. If a pacman gets to eat a pac-star, he will be given a temporary ability to eat the other pacmen. The amount of time a pacman can have this ability is only 5 seconds. The pacman that has been eaten will be revived at the middle of the map. However, he will not be able to move for the first 3 seconds upon revival. When the game is over, the pacman that has the most number of pac-points wins. Players can chat during the game.\n\n1 pac-dot : 1pt\n1 pac-star : 2pt\n1 pacman : 3pt")
 
 def exit_Game():
 	prompt = messagebox.askyesno("EXIT", "Are you sure you want to exit? No data will be saved.")
@@ -250,12 +243,15 @@ def game_map(chosen_map, player, packet, lobby_id, connectPacket):
 	global optionsFrm
 	optionsFrm = Frame(window, bg="BLACK")
 
+	lobby_id_lbl = Label(optionsFrm, text="Lobby ID: "+lobby_id, bg="BLACK", fg="WHITE")
+	lobby_id_lbl.grid(column=0, row=0, padx=40)
+
 	map_name_lbl = Label(optionsFrm, text=map_name, bg="#80dba6", padx=15)
-	map_name_lbl.grid(column=0, row=0, padx=40)	
+	map_name_lbl.grid(column=1, row=0, padx=40)	
 	
 	global Back_btn
 	Back_btn = Button(optionsFrm, text="Exit Game",bg="sky blue", padx=15, pady=0, command=exit)
-	Back_btn.grid(column=1, row=0, padx=40)	
+	Back_btn.grid(column=2, row=0, padx=40)	
 		
 	# CHAT HISTORY FRAME ------------------------------------------------------
 	global chat_history_Frm
@@ -485,6 +481,7 @@ def get_chat_entry(player, packet, lobby_id, connectPacket, event=None):
 # BACK TO MAIN MENU PROMPT ==========================================================================================
 def back():
 	prompt = messagebox.askyesno("ARE YOU SURE YOU WANT TO EXIT?", "Once you leave, your game will be lost.")
+
 	if prompt == True:
 		map_Frame.destroy()
 		optionsFrm.destroy()
