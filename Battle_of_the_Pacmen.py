@@ -75,7 +75,9 @@ def ConnectHostToServer(player, packet, max_players):
 	socket.send(playerListPacket.SerializeToString())
 	packet_received = bytearray(socket.recv(2048))
 	playerListPacket.ParseFromString(packet_received)
-
+	player_list = playerListPacket.player_list
+	print("HERE")
+	print(player_list)
 	return connectPacket
 
 # Connect players (including host) to server using connectPacket	
@@ -110,7 +112,8 @@ def ConnectPlayerToServer(player, connectPacket, lobby_id):
 	packet_received = bytearray(socket.recv(2048))
 	playerListPacket.ParseFromString(packet_received)	
 	player_list = playerListPacket.player_list
-
+	print("HERE")
+	print(player_list)
 	return connectPacket
 
 #############################################################################################
@@ -190,6 +193,8 @@ def btn_ok(event=None):
 
 		game_map(chosen_map, player, packet, lobby_id, connectPacket) 	# show game
 		name_Frm.pack_forget()
+		global my_name 
+		my_name = connectPacket.player.name
 	else:
 		L = Label(name_Frm, text="Invalid name. Must consist of \nletters and numbers only.", bg="BLACK", fg="RED")
 		L.grid(column=0, row=3, columnspan=2)
@@ -308,6 +313,9 @@ def game_map(chosen_map, player, packet, lobby_id, connectPacket):
 	# SCOREBOARD -------------------------------------------------------------
 	score_Frm = LabelFrame(grp_Frm,text = "SCOREBOARD", bg = "BLACK", fg = "RED", height=50, width=200, font="ARIAL")
 	score_Frm.pack(side=LEFT, ipadx=50)
+
+	for i in player_list:
+		print(i.name)
 
 	x1 = Label(score_Frm, text = "Up Arrow Key - Go Up", bg = "BLACK", fg = "WHITE")
 	x1.pack()
@@ -473,7 +481,8 @@ def chat_process(player, packet, lobby_id, connectPacket):
 			packet_received = bytearray(socket.recv(2048))
 			playerListPacket.ParseFromString(packet_received)	
 			player_list = playerListPacket.player_list
-
+			print("HERE")
+			print(player_list)
 		# Chat packet type
 		if packet_type == 3:
 
@@ -485,6 +494,8 @@ def chat_process(player, packet, lobby_id, connectPacket):
 			chat_history_Txt.insert(END, chatPacket.player.name+ ':' + chatPacket.message + '\n')
 			chat_history_Txt.see("end")
 			chat_history_Txt.config(state=DISABLED)
+			if my_name == chatPacket.player.name:
+				chat_entry.delete(0,len(chat_entry.get()))
 			
 		# Exit Chat
 		if chatPacket.message.strip() == "bye" and chatPacket.player.name == player.name:
@@ -492,7 +503,7 @@ def chat_process(player, packet, lobby_id, connectPacket):
 			disconnectPacket.player.name = player.name
 			socket.send(disconnectPacket.SerializeToString())
 
-		chat_entry.delete(0,len(chat_entry.get()))
+		
 
 	window.after(100,chat_process,player, packet, lobby_id, connectPacket)
 
