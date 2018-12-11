@@ -66,6 +66,16 @@ def ConnectHostToServer(player, packet, max_players):
 	connectPacket.ParseFromString(connect_data)
 
 	print('Received from server: ' + str(connectPacket))  # show in terminal
+	
+	#Create global player_list list
+	global player_list
+	player_list = []
+	playerListPacket = packet.PlayerListPacket()
+	playerListPacket.type = TcpPacket.PLAYER_LIST
+	socket.send(playerListPacket.SerializeToString())
+	packet_received = bytearray(socket.recv(2048))
+	playerListPacket.ParseFromString(packet_received)
+
 	return connectPacket
 
 # Connect players (including host) to server using connectPacket	
@@ -89,8 +99,18 @@ def ConnectPlayerToServer(player, connectPacket, lobby_id):
 	
 	#if the received response from server is ERR_LDNE, 
 	#parsing connect_data will result to an exception hence going inside except block
-		
 	
+	#Create global player_list list
+	global player_list
+	player_list = []
+	packet = TcpPacket()
+	playerListPacket = packet.PlayerListPacket()
+	playerListPacket.type = TcpPacket.PLAYER_LIST
+	socket.send(playerListPacket.SerializeToString())
+	packet_received = bytearray(socket.recv(2048))
+	playerListPacket.ParseFromString(packet_received)	
+	player_list = playerListPacket.player_list
+
 	return connectPacket
 
 #############################################################################################
@@ -422,6 +442,14 @@ def chat_process(player, packet, lobby_id, connectPacket):
 			chat_history_Txt.insert(END, connectPacket.player.name + " has entered the chat room." + '\n')
 			chat_history_Txt.see("end")
 			chat_history_Txt.config(state=DISABLED)
+
+			#Update player_list every time a new player entered the chat
+			playerListPacket = packet.PlayerListPacket()
+			playerListPacket.type = TcpPacket.PLAYER_LIST
+			socket.send(playerListPacket.SerializeToString())
+			packet_received = bytearray(socket.recv(2048))
+			playerListPacket.ParseFromString(packet_received)	
+			player_list = playerListPacket.player_list
 
 		# Chat packet type
 		if packet_type == 3:
