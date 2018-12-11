@@ -169,4 +169,8 @@ class Pacman(GameEntity):
 # pacman = Pacman("yellow", "player", world)
 
 
+<<<<<<< HEAD
 # window.mainloop()
+=======
+# window.mainloop()
+>>>>>>> 99fec82637b17bcd512f51a9a57b546361bc3fd5

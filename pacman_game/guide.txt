@@ -1,0 +1,79 @@
+1. udppacket class
+	init(type)
+
+	usage:
+		used for sending info from client to server
+
+2. server class
+	init(host, port)
+	room {}
+
+	def run
+		...
+
+		while True:
+			# data, address = recvfrom
+			# pickle.loads # deserialization of data
+
+			packet_type = data[]
+
+			switch packet_type
+				Connect
+					print
+				Create Room
+					player = data[]
+					lobby_id = data[]
+					pacman.Room(player, lobby_id)
+				Join
+					player lobby_id
+					room.AddClient ==>
+				Start Game
+					lobby_id
+					map = create pacman.Map
+					room.append(e=new room)
+
+					datapacket ang isesend sa client for every action made
+
+					datapacket.state = map.state
+
+					send datapacket to all client in the client_list
+				Move
+					get map and movement
+					update map
+
+
+3. Pacman
+	init(name host port)
+
+	Room
+		get initial coordinates (generate)
+		add client
+
+	Map
+		state --> matrix
+		coordinates
+
+		move()
+
+
+4. client
+
+	...
+	receive
+
+	movement():
+		event listeners
+
+	Client
+		init(host, port, pname)
+
+		# each client should have different ports
+
+		def createRoom():
+			send packet na CREATE_ROOM
+
+		def move()
+
+
+
+client -> server -> pacman -> broadcast to all clients
