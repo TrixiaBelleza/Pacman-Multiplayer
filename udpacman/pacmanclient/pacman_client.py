@@ -21,7 +21,12 @@ class ServerHandler(socket.socket, threading.Thread):
         self.connect()
         self.player_number = self.receive_player_number()
         while True:
+<<<<<<< HEAD
         	print("Player " + str(self.player_number) + " connencted.")
+=======
+        	pass
+            # print("Player " + str(self.player_number) + " connencted.")
+>>>>>>> 668eb8a57c0825110838ccf801f22fa5b0dbf731
             # game_update_json = self.receive_game_update_json()
             # self.pong_world.update_with_json(game_update_json)
             # self.send_client_command()
