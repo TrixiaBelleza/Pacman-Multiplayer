@@ -15,6 +15,44 @@ port = int(port)
 SERVER_ADDRESS = (host, port)
 # SCREEN_SIZE = (pong.pacman_entities.World.WIDTH, pong.pacman_entities.World.HEIGHT)
 
+<<<<<<< HEAD
+=======
+def key_listeners(event):
+	player_xpos = pong.pacman_entities.Pacman.get_xPos(pong.pacman_entities.Pacman)
+	player_ypos = pong.pacman_entities.Pacman.get_yPos(pong.pacman_entities.Pacman) 
+	map_matrix = pong.pacman_entities.World.get_map_matrix(pong.pacman_entities.World)
+	print("MAP MATRIX")
+	print(map_matrix)
+	if event.keysym == "Left":
+		print("Entered left")
+		if map_matrix[player_xpos][player_ypos-1] == "D" or map_matrix[player_xpos][player_ypos-1] == "s" or map_matrix[player_xpos][player_ypos-1] == "e":
+			map_matrix[player_xpos][player_ypos] = "e"
+			map_matrix[player_xpos][player_ypos-1] = "P"
+			pong.pacman_entities.World.set_canvas(player_ypos*20, player_xpos*20, player_ypos*20+20, player_xpos*20+20, "BLACK")
+			pong.pacman_entities.World.set_canvas((player_ypos-1)*20, player_xpos*20, (player_ypos-1)*20+20, player_xpos*20+20, "RED")
+			# block = canvas.create_rectangle(player_ypos*20, player_xpos*20, player_ypos*20+20, player_xpos*20+20, fill="BLACK", outline="")
+			# block = canvas.create_rectangle((player_ypos-1)*20, player_xpos*20, (player_ypos-1)*20+20, player_xpos*20+20, fill="RED", outline="")
+	# elif event.keysym == "Right":
+	# 	if map_matrix[player_xpos][player_ypos+1] == "D" or map_matrix[player_xpos][player_ypos+1] == "s" or map_matrix[player_xpos][player_ypos+1] == "e":
+	# 		map_matrix[player_xpos][player_ypos] = "e"
+	# 		map_matrix[player_xpos][player_ypos+1] = "P"
+	# 		block = canvas.create_rectangle(player_ypos*20, player_xpos*20, player_ypos*20+20, player_xpos*20+20, fill="BLACK", outline="")
+	# 		block = canvas.create_rectangle((player_ypos+1)*20, player_xpos*20, (player_ypos+1)*20+20, player_xpos*20+20, fill="RED", outline="")
+	# elif event.keysym == "Up":
+	# 	if map_matrix[player_xpos-1][player_ypos] == "D" or map_matrix[player_xpos-1][player_ypos] == "s" or map_matrix[player_xpos-1][player_ypos] == "e":
+	# 		map_matrix[player_xpos][player_ypos] = "e"
+	# 		map_matrix[player_xpos-1][player_ypos] = "P"
+	# 		block = canvas.create_rectangle(player_ypos*20, player_xpos*20, player_ypos*20+20, player_xpos*20+20, fill="BLACK", outline="")
+	# 		block = canvas.create_rectangle(player_ypos*20, (player_xpos-1)*20, player_ypos*20+20, (player_xpos-1)*20+20, fill="RED", outline="")
+	# elif event.keysym == "Down":
+	# 	if map_matrix[player_xpos+1][player_ypos] == "D" or map_matrix[player_xpos+1][player_ypos] == "s" or map_matrix[player_xpos+1][player_ypos] == "e":
+	# 		map_matrix[player_xpos][player_ypos] = "e"
+	# 		map_matrix[player_xpos+1][player_ypos] = "P"
+	# 		block = canvas.create_rectangle(player_ypos*20, player_xpos*20, player_ypos*20+20, player_xpos*20+20, fill="BLACK", outline="")
+	# 		block = canvas.create_rectangle(player_ypos*20, (player_xpos+1)*20, player_ypos*20+20, (player_xpos+1)*20+20, fill="RED", outline="")
+
+
+>>>>>>> a0fef4317ce4d9a25f687f0f1ab8d469c581373e
 def main():
 
 
@@ -30,6 +68,10 @@ def main():
 	world = pong.pacman_entities.World("map1.txt")
 	window = world.pacman_window()
 	window.resizable(width=FALSE, height=FALSE)
+<<<<<<< HEAD
+=======
+	global pacman
+>>>>>>> a0fef4317ce4d9a25f687f0f1ab8d469c581373e
 	pacman = pong.pacman_entities.Pacman("yellow", "player", world)
 	window.mainloop()
 		

@@ -2,12 +2,20 @@ import pygame
 from pygame.math import Vector2
 import tkinter
 from tkinter import *
+<<<<<<< HEAD
+=======
+import pacmanclient.pacman_main
+>>>>>>> a0fef4317ce4d9a25f687f0f1ab8d469c581373e
 # from tkinter import messagebox
 
 class World():
 	WIDTH = 500
 	HEIGHT = 500
+<<<<<<< HEAD
 
+=======
+	map_matrix = []
+>>>>>>> a0fef4317ce4d9a25f687f0f1ab8d469c581373e
 	def __init__(self, filename):
 		self.filename = filename
 		self.game_map()
@@ -60,9 +68,23 @@ class World():
 				x_pos += increment
 			y_pos += increment
 
+<<<<<<< HEAD
 		# surface = pygame.Surface(500,500)
 		# return pygame.rect(surface, (0,255,255), [0,0,10,10])
 
+=======
+		self.canvas.bind_all("<KeyPress-Up>", pacmanclient.pacman_main.key_listeners) # binds event listener to whole canvas
+		self.canvas.bind_all("<KeyPress-Down>", pacmanclient.pacman_main.key_listeners) # binds event listener to whole canvas
+		self.canvas.bind_all("<KeyPress-Left>", pacmanclient.pacman_main.key_listeners) # binds event listener to whole canvas
+		self.canvas.bind_all("<KeyPress-Right>", pacmanclient.pacman_main.key_listeners) # binds event listener to whole canvas
+
+		# surface = pygame.Surface(500,500)
+		# return pygame.rect(surface, (0,255,255), [0,0,10,10])
+
+	def set_canvas(self,a,b,c,d, color):
+		block = self.canvas.create_rectangle(a,b,c,d, fill=color, outline="")
+	
+>>>>>>> a0fef4317ce4d9a25f687f0f1ab8d469c581373e
 
 	def game_map(self):
 		window = self.pacman_window()
@@ -83,13 +105,22 @@ class World():
 		self.map_Frame.pack()
 		self.draw_map()
 
+<<<<<<< HEAD
 	def get_map_matrix():
+=======
+	def get_map_matrix(self):
+>>>>>>> a0fef4317ce4d9a25f687f0f1ab8d469c581373e
 		return self.map_matrix
 
 	def insert_object_to_map_matrix(self,xPos,yPos, entity):
 		self.map_matrix[xPos][yPos] = entity
+<<<<<<< HEAD
 		block = self.canvas.create_rectangle(yPos*20, xPos*20, yPos*20+20, xPos*20+20, fill="BLACK", outline="")
 		block = self.canvas.create_rectangle(yPos*20, (xPos+1)*20, yPos*20+20, (xPos+1)*20+20, fill="RED", outline="")
+=======
+		block = self.canvas.create_rectangle(yPos*20, xPos*20, yPos*20+20, xPos*20+20, fill="RED", outline="")
+		# block = self.canvas.create_rectangle(yPos*20, (xPos+1)*20, yPos*20+20, (xPos+1)*20+20, fill="RED", outline="")
+>>>>>>> a0fef4317ce4d9a25f687f0f1ab8d469c581373e
 
 class GameEntity():
 	world = None
@@ -101,12 +132,18 @@ class GameEntity():
 		   super().__init__(GameEntity.world)    # Place this in the world automatically
 
 class Pacman(GameEntity):
+<<<<<<< HEAD
+=======
+	xPos=1
+	yPos=1
+>>>>>>> a0fef4317ce4d9a25f687f0f1ab8d469c581373e
 	def __init__(self, color, player_name, world):
 		self.world = world
 		self.color = color
 		self.player_name = player_name
 		if self.color == "yellow":
 			self.xPos = 1
+<<<<<<< HEAD
 			self.yPos = 1
 
 		world.insert_object_to_map_matrix(self.xPos,self.yPos,"P")
@@ -115,6 +152,16 @@ class Pacman(GameEntity):
 			return self.xPos
 		def get_yPos(self):
 			return self.yPos
+=======
+			self.yPos = 3
+
+		world.insert_object_to_map_matrix(self.xPos,self.yPos,"P")
+
+	def get_xPos(self):
+		return self.xPos
+	def get_yPos(self):
+		return self.yPos
+>>>>>>> a0fef4317ce4d9a25f687f0f1ab8d469c581373e
 
 # world = World("map1.txt")
 # window = world.pacman_window()
