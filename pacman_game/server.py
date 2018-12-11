@@ -36,10 +36,8 @@ class Server():
 				lobby_id = "JK898"
 				#create room using pacman.Room(lobby_id)
 				self.room = pacman.Room(lobby_id)
-				#Add host to room
-				self.room.add_client(loaded_data.player)
-				
-				#Send lobby_id to client
+			
+				#Send lobby_id to client 
 				sendLobbyIdPacket = UDPpacket.UDPpacket("SEND_LOBBY_ID") 
 				sendLobbyIdPacket.lobby_id = lobby_id
 				
@@ -49,5 +47,18 @@ class Server():
 				#Add client to room 
 				self.room.add_client(loaded_data.player)
 				print("ADDED " + loaded_data.player.name)
-				print("List of players in room: ")
-				print(self.room.clients)
+	
+			if packet_type == "PLAYER_COUNT":
+				#send room to client
+				sendRoomPacket = UDPpacket.UDPpacket("SEND_ROOM") 
+				sendRoomPacket.player_count = self.room.player_counter
+			
+				self.socket.sendto(pickle.dumps(sendRoomPacket), addr)
+
+			if packet_type == "START_GAME":
+				game_map = pacman.GameMap("map1.txt")
+
+				#Send gamemap
+				sendGameMapPacket =  UDPpacket.UDPpacket("SEND_GAMEMAP") 
+				sendGameMapPacket.map_matrix = game_map.map_matrix
+				self.socket.sendto(pickle.dumps(sendGameMapPacket), addr)

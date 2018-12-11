@@ -39,7 +39,7 @@ class GameMap():
 				line = []
 				line[0:len(lines)] = iter(lines)
 				self.map_matrix.append(line)
-
+				
 		# print(self.map_matrix)
 
 		def move(self, player, movement):

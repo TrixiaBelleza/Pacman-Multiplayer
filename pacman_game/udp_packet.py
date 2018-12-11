@@ -6,8 +6,9 @@ class UDPpacket():
 	packet_type = ""
 	player = None
 	lobby_id = ''
-	map_state = [] 
+	map_matrix = [] 
 	movement = ''
+	player_count = 0
 	player_position = () #x,y
 
 	def __init__(self, packet_type):

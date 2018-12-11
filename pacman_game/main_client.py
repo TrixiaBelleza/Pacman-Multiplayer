@@ -11,14 +11,17 @@ hostname = '127.0.0.1'
 c.hostname = hostname
 c.port = port
 
-
 c.connect()
 
 if c.player.player_type == "HOST" :
-	c.create_room()
+	lobby_id = c.create_room()
 else :
 	lobby_id = input("Enter lobby_id: ")
-	c.join(lobby_id)
+	
+c.join(lobby_id)
 
 while True:
-	pass
+	num_of_players = c.recvNumOfPlayers()
+	print(num_of_players)
+	if num_of_players == 3:
+		c.startGame()
