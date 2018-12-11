@@ -53,25 +53,28 @@ class GameMap():
 		for client in self.clients :
 			if player.name == client.name :
 				row, col = client.current_pos
-				self.map_matrix[row][col] = "e"
 
 				if movement == "Left":
 					if self.map_matrix[row][col-1] == "D" or self.map_matrix[row][col-1] == "s" or self.map_matrix[row][col-1] == "e":
+						self.map_matrix[row][col] = "e"
 						self.map_matrix[row][col-1] = "P"
 						client.current_pos = (row,col-1)
 
 				if movement == "Right":
 					if self.map_matrix[row][col+1] == "D" or self.map_matrix[row][col+1] == "s" or self.map_matrix[row][col+1] == "e":
+						self.map_matrix[row][col] = "e"
 						self.map_matrix[row][col+1] = "P"
 						client.current_pos = (row,col+1)
 				
 				if movement == "Up":
 					if self.map_matrix[row-1][col] == "D" or self.map_matrix[row-1][col] == "s" or self.map_matrix[row-1][col] == "e":
+						self.map_matrix[row][col] = "e"
 						self.map_matrix[row-1][col] = "P"
 						client.current_pos = (row-1,col)
 
 				if movement == "Down":
 					if self.map_matrix[row+1][col] == "D" or self.map_matrix[row+1][col] == "s" or self.map_matrix[row+1][col] == "e":
+						self.map_matrix[row][col] = "e"
 						self.map_matrix[row+1][col] = "P"
 						client.current_pos = (row+1,col)
 

@@ -19,7 +19,7 @@ class Client():
 	map_matrix = []
 	window = ''
 	canvas = ''
-	#Bale gagawin natin na equivalent si CLIENT and PLAYER
+
 	def __init__(self, player_name, player_type):
 		self.player = pacman.Player(player_name, player_type)
 
@@ -28,6 +28,7 @@ class Client():
 		self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self.client_addr = (self.hostname, self.port)
 		self.socket.bind(self.client_addr)
+
 		# self.socket.setblocking(0)
 	
 		#Always create a UDPpacket first! before sending to server.
@@ -54,7 +55,14 @@ class Client():
 		joinPacket = UDPpacket.UDPpacket("JOIN")
 		joinPacket.player = self.player
 		joinPacket.lobby_id = lobby_id
-		self.socket.sendto(pickle.dumps(joinPacket), self.server_address)	
+		self.socket.sendto(pickle.dumps(joinPacket), self.server_address)
+
+		data, addr = self.socket.recvfrom(self.BUFFER_SIZE)
+		loaded_data = pickle.loads(data)
+		if loaded_data.packet_type == "VALID_LOBBY_ID":
+			return True
+		else:
+			return False
 
 	def recvNumOfPlayers(self):
 		getPlayerCountPacket = UDPpacket.UDPpacket("PLAYER_COUNT")
@@ -95,7 +103,17 @@ class Client():
 		self.window = self.pacman_window()
 		self.window.resizable(width=FALSE, height=FALSE)
 		self.game_map()
-		self.window.mainloop()
+		# self.window.mainloop()
+		while True:
+			self.window.update_idletasks()
+			self.window.update()
+
+			updatePacket = UDPpacket.UDPpacket("UPDATE_PACKET")
+			self.socket.sendto(pickle.dumps(updatePacket), self.server_address)
+			data, addr = self.socket.recvfrom(self.BUFFER_SIZE)
+			loaded_data = pickle.loads(data)
+
+			self.map_matrix = loaded_data.map_matrix
 
 	def pacman_window(self):
 		tk_window = tkinter.Tk()
